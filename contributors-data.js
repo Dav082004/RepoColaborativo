@@ -24,15 +24,15 @@ const contributors = [
   },
 
   // Ahora es tu turno de agregar tu información siguiendo el template de abajo 👇(quita los /* */ de comentario)
-  /*{
-    name: "Tu Nombre Completo", 
-    nickname: "tu_github_username", // ✅ Requerido
-    github: "https://github.com/tu_username", // ✅ Requerido
-    linkedin: "https://linkedin.com/in/tu-perfil", // ⭕ Opcional
-    image: "https://github.com/tu_username.png", // ⭕ Opcional (se usa tu avatar de GitHub automáticamente o puedes poner una URL de imagen personalizada)
-    description: "Una breve descripción sobre ti", // ✅ Requerido (máximo 150 caracteres)
-    hobbies: ["Hobby1", "Hobby2", "Hobby3", "Hobby4"], // ✅ Requerido (máximo 4 hobbies)
-  },*/
+  {
+    name: "Tu Nombre Comsadasdapleto", 
+    nickname: "tu_github_useasrname", // ✅ Requerido
+    github: "https://github.com/tu_uassername", // ✅ Requerido
+    linkedin: "https://linkedin.com/in/tu-perfasil", // ⭕ Opcional
+    image: "https://github.com/tu_usernaasme.png", // ⭕ Opcional (se usa tu avatar de GitHub automáticamente o puedes poner una URL de imagen personalizada)
+    description: "Una breve descripción sobsare ti", // ✅ Requerido (máximo 150 caracteres)
+    hobbies: ["Hobby12", "Hobby22", "Hobby33", "Hobby43"], // ✅ Requerido (máximo 4 hobbies)
+  },
 ];
 
 // ⚠️ NO MODIFIQUES NADA DE AQUÍ HACIA ABAJO ⚠️
