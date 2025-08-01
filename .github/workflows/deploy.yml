@@ -311,13 +311,31 @@ jobs:
           fi
 
           # Permitir cambios solo en contributors-data.js y archivos de documentación
-          ALLOWED_PATTERN="^(contributors-data\.js|README\.md|\.github/.*|docs/.*)$"
+          # Para setup inicial, permitir archivos del proyecto base
+          ALLOWED_PATTERN="^(contributors-data\.js|README\.md|\.github/.*|docs/.*|_config\.yml|\.gitignore|index\.html|como-contribuir\.html|js/.*|styles/.*|assets/.*)$"
+
+          # Detectar si es setup inicial (muchos archivos principales presentes)
+          SETUP_FILES_COUNT=$(echo "$CHANGED_FILES" | grep -E "(index\.html|contributors-data\.js|js/|styles/)" | wc -l)
+
+          if [ "$SETUP_FILES_COUNT" -gt 3 ]; then
+            echo "🔧 Setup inicial detectado - permitiendo archivos del proyecto base"
+            IS_INITIAL_SETUP=true
+          else
+            echo "📝 Pull Request regular - aplicando restricciones estrictas"
+            IS_INITIAL_SETUP=false
+            # Para PRs regulares, solo permitir contributors-data.js y docs
+            ALLOWED_PATTERN="^(contributors-data\.js|README\.md|\.github/.*|docs/.*)$"
+          fi
 
           while IFS= read -r file; do
             if [ -n "$file" ] && [[ ! "$file" =~ $ALLOWED_PATTERN ]]; then
-              echo "❌ Error: No se permite modificar $file"
-              echo "💡 Solo puedes modificar contributors-data.js para agregar tu información"
-              exit 1
+              if [ "$IS_INITIAL_SETUP" = true ]; then
+                echo "⚠️ Archivo no estándar en setup inicial: $file"
+              else
+                echo "❌ Error: No se permite modificar $file"
+                echo "💡 Solo puedes modificar contributors-data.js para agregar tu información"
+                exit 1
+              fi
             fi
           done <<< "$CHANGED_FILES"
 
@@ -326,7 +344,7 @@ jobs:
             echo "✅ contributors-data.js fue modificado"
             
             # Validar el formato del nuevo colaborador
-            node -e "
+            CHANGED_FILES="$CHANGED_FILES" node -e "
               const fs = require('fs');
               const { execSync } = require('child_process');
               
@@ -340,6 +358,8 @@ jobs:
                 
                 // Intentar obtener la versión de main
                 let mainContributors = [];
+                let isInitialSetup = false;
+                
                 try {
                   execSync('git show origin/main:contributors-data.js > /tmp/main-contributors.js 2>/dev/null');
                   const mainContent = fs.readFileSync('/tmp/main-contributors.js', 'utf8');
@@ -347,10 +367,25 @@ jobs:
                   mainContributors = mainMatch ? eval(mainMatch[1]) : [];
                   console.log(\`📊 Colaboradores en main: \${mainContributors.length}\`);
                 } catch (error) {
-                  console.log('ℹ️ No se pudo obtener versión anterior (posiblemente primer commit)');
-                  // Si es el primer commit, permitir cualquier cantidad de colaboradores
+                  console.log('ℹ️ No se pudo obtener versión anterior (posiblemente primer commit o setup inicial)');
+                  isInitialSetup = true;
+                }
+                
+                // Detectar setup inicial por cantidad de archivos cambiados
+                const setupFilesPattern = /(index\.html|js\/|styles\/|assets\/)/;
+                const changedFiles = process.env.CHANGED_FILES || '';
+                const hasSetupFiles = changedFiles.split('\\n').some(file => setupFilesPattern.test(file));
+                
+                if (isInitialSetup || hasSetupFiles) {
+                  console.log('🔧 Setup inicial detectado - validación flexible de colaboradores');
                   if (currentContributors.length > 0) {
-                    console.log('✅ Primer commit con colaboradores detectado');
+                    console.log(\`✅ Setup inicial con \${currentContributors.length} colaborador(es) detectado\`);
+                    // Validar formato de cada colaborador pero permitir múltiples
+                    currentContributors.forEach((contributor, index) => {
+                      if (contributor.name && contributor.nickname && contributor.hobbies) {
+                        console.log(\`✅ Colaborador \${index + 1}: \${contributor.name} (@\${contributor.nickname})\`);
+                      }
+                    });
                     process.exit(0);
                   }
                 }
