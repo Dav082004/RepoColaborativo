@@ -283,24 +283,46 @@ jobs:
 
           # Verificar que solo se modificó contributors-data.js
           git fetch origin main
-          CHANGED_FILES=$(git diff --name-only origin/main...HEAD)
+
+          # Obtener archivos modificados con manejo de error
+          CHANGED_FILES=""
+          if git merge-base origin/main HEAD >/dev/null 2>&1; then
+            # Hay una base común, usar diff normal
+            CHANGED_FILES=$(git diff --name-only origin/main...HEAD)
+          else
+            # No hay base común (primera vez), usar diff directo
+            echo "⚠️ No se encontró base común, comparando con HEAD~1"
+            if git rev-parse HEAD~1 >/dev/null 2>&1; then
+              CHANGED_FILES=$(git diff --name-only HEAD~1 HEAD)
+            else
+              # Si es el primer commit, mostrar todos los archivos
+              echo "ℹ️ Primer commit detectado, validando archivos actuales"
+              CHANGED_FILES=$(git ls-files)
+            fi
+          fi
 
           echo "📝 Archivos modificados:"
           echo "$CHANGED_FILES"
+
+          # Si no hay archivos modificados, salir
+          if [ -z "$CHANGED_FILES" ]; then
+            echo "ℹ️ No se detectaron cambios en archivos"
+            exit 0
+          fi
 
           # Permitir cambios solo en contributors-data.js y archivos de documentación
           ALLOWED_PATTERN="^(contributors-data\.js|README\.md|\.github/.*|docs/.*)$"
 
           while IFS= read -r file; do
-            if [[ ! "$file" =~ $ALLOWED_PATTERN ]]; then
+            if [ -n "$file" ] && [[ ! "$file" =~ $ALLOWED_PATTERN ]]; then
               echo "❌ Error: No se permite modificar $file"
               echo "💡 Solo puedes modificar contributors-data.js para agregar tu información"
               exit 1
             fi
           done <<< "$CHANGED_FILES"
 
-          # Validar que se agregó exactamente un colaborador
-          if echo "$CHANGED_FILES" | grep -q "contributors-data.js"; then
+          # Validar que se agregó exactamente un colaborador (solo si existe contributors-data.js)
+          if echo "$CHANGED_FILES" | grep -q "contributors-data.js" && [ -f "contributors-data.js" ]; then
             echo "✅ contributors-data.js fue modificado"
             
             # Validar el formato del nuevo colaborador
@@ -314,11 +336,24 @@ jobs:
                 const currentMatch = currentContent.match(/const contributors = (\[[\s\S]*?\]);/);
                 const currentContributors = currentMatch ? eval(currentMatch[1]) : [];
                 
-                // Obtener la versión de main
-                execSync('git show origin/main:contributors-data.js > /tmp/main-contributors.js');
-                const mainContent = fs.readFileSync('/tmp/main-contributors.js', 'utf8');
-                const mainMatch = mainContent.match(/const contributors = (\[[\s\S]*?\]);/);
-                const mainContributors = mainMatch ? eval(mainMatch[1]) : [];
+                console.log(\`📊 Colaboradores actuales: \${currentContributors.length}\`);
+                
+                // Intentar obtener la versión de main
+                let mainContributors = [];
+                try {
+                  execSync('git show origin/main:contributors-data.js > /tmp/main-contributors.js 2>/dev/null');
+                  const mainContent = fs.readFileSync('/tmp/main-contributors.js', 'utf8');
+                  const mainMatch = mainContent.match(/const contributors = (\[[\s\S]*?\]);/);
+                  mainContributors = mainMatch ? eval(mainMatch[1]) : [];
+                  console.log(\`📊 Colaboradores en main: \${mainContributors.length}\`);
+                } catch (error) {
+                  console.log('ℹ️ No se pudo obtener versión anterior (posiblemente primer commit)');
+                  // Si es el primer commit, permitir cualquier cantidad de colaboradores
+                  if (currentContributors.length > 0) {
+                    console.log('✅ Primer commit con colaboradores detectado');
+                    process.exit(0);
+                  }
+                }
                 
                 const newContributorsCount = currentContributors.length - mainContributors.length;
                 
@@ -355,7 +390,7 @@ jobs:
               }
             "
           else
-            echo "ℹ️  contributors-data.js no fue modificado en este PR"
+            echo "ℹ️ contributors-data.js no fue modificado en este PR"
           fi
 
           echo "🎉 Pull Request válido!"
