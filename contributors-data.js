@@ -41,14 +41,7 @@ const contributors = [
     description: "Soy un gato con 8 patas", // ✅ Requerido (máximo 150 caracteres)
     hobbies: ["Programar"], // ✅ Requerido (máximo 4 hobbies)
   },
-  {
-    name: "Octocat2", 
-    nickname: "gat1t2-ola", // ✅ Requerido
-    github: "https://github.com/gat1t2-ola", // ✅ Requerido
-    image: "https://github.com/gat1t3-ola.png", // ⭕ Opcional (se usa tu avatar de GitHub automáticamente o puedes poner una URL de imagen personalizada)
-    description: "Soy un gato con 8 patas", // ✅ Requerido (máximo 150 caracteres)
-    hobbies: ["Programar2"], // ✅ Requerido (máximo 4 hobbies)
-  },
+  //Sigue por aqui...
 ];
 
 // ⚠️ NO MODIFIQUES NADA DE AQUÍ HACIA ABAJO ⚠️
