@@ -5,6 +5,7 @@ on:
     branches: [main]
   pull_request:
     branches: [main]
+  workflow_dispatch:
 
 permissions:
   contents: read
@@ -200,7 +201,7 @@ jobs:
 
       - name: Setup Pages
         uses: actions/configure-pages@v4
-        
+
       - name: Debug Info
         run: |
           echo "🔍 Información de debug:"
@@ -452,11 +453,11 @@ jobs:
         uses: actions/checkout@v4
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-          
+
       - name: Auto-merge PR
         run: |
           echo "🤖 Iniciando auto-merge para PR #${{ github.event.number }}"
-          
+
           # Información del PR
           echo "📋 Información del PR:"
           echo "Número: ${{ github.event.number }}"
@@ -464,21 +465,21 @@ jobs:
           echo "Título: ${{ github.event.pull_request.title }}"
           echo "Base: ${{ github.event.pull_request.base.ref }}"
           echo "Head: ${{ github.event.pull_request.head.ref }}"
-          
+
           # Verificar que el PR esté abierto y sea hacia main
           if [ "${{ github.event.pull_request.state }}" != "open" ]; then
             echo "❌ El PR no está abierto"
             exit 1
           fi
-          
+
           if [ "${{ github.event.pull_request.base.ref }}" != "main" ]; then
             echo "❌ El PR no es hacia la rama main"
             exit 1
           fi
-          
+
           # Hacer merge del PR
           echo "🔄 Realizando merge del PR..."
-          
+
           curl -X PUT \
             -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
             -H "Accept: application/vnd.github.v3+json" \
@@ -492,16 +493,28 @@ jobs:
           if [ $? -eq 0 ]; then
             echo "✅ PR mergeado exitosamente"
             echo "🚀 El deployment se activará automáticamente en unos momentos"
+            
+            # Esperar un momento para que el merge se propague
+            sleep 5
+            
+            # Activar el workflow de deploy manualmente
+            echo "🔄 Activando workflow de deploy..."
+            curl -X POST \
+              -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+              -H "Accept: application/vnd.github.v3+json" \
+              "https://api.github.com/repos/${{ github.repository }}/actions/workflows/deploy.yml/dispatches" \
+              -d '{"ref":"main"}'
+              
           else
             echo "❌ Error al mergear el PR"
             exit 1
           fi
-          
+
       - name: Comentar en el PR
         if: success()
         run: |
           echo "💬 Agregando comentario de confirmación al PR..."
-          
+
           curl -X POST \
             -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
             -H "Accept: application/vnd.github.v3+json" \
