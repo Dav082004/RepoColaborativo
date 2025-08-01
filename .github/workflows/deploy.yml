@@ -193,7 +193,7 @@ jobs:
       url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
     needs: validate
-    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    if: github.ref == 'refs/heads/main'
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -208,6 +208,7 @@ jobs:
           echo "Event: ${{ github.event_name }}"
           echo "Actor: ${{ github.actor }}"
           echo "Repository: ${{ github.repository }}"
+          echo "SHA: ${{ github.sha }}"
 
       - name: Prepare deployment
         run: |
@@ -253,7 +254,7 @@ jobs:
   verify:
     runs-on: ubuntu-latest
     needs: deploy
-    if: github.ref == 'refs/heads/main'
+    if: github.ref == 'refs/heads/main' && needs.deploy.result == 'success'
     steps:
       - name: Verify deployment
         run: |
@@ -437,3 +438,74 @@ jobs:
           fi
 
           echo "🎉 Pull Request válido!"
+
+  # Auto-merge para Pull Requests válidos
+  auto-merge:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    needs: validate-pr
+    permissions:
+      contents: write
+      pull-requests: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          
+      - name: Auto-merge PR
+        run: |
+          echo "🤖 Iniciando auto-merge para PR #${{ github.event.number }}"
+          
+          # Información del PR
+          echo "📋 Información del PR:"
+          echo "Número: ${{ github.event.number }}"
+          echo "Autor: ${{ github.event.pull_request.user.login }}"
+          echo "Título: ${{ github.event.pull_request.title }}"
+          echo "Base: ${{ github.event.pull_request.base.ref }}"
+          echo "Head: ${{ github.event.pull_request.head.ref }}"
+          
+          # Verificar que el PR esté abierto y sea hacia main
+          if [ "${{ github.event.pull_request.state }}" != "open" ]; then
+            echo "❌ El PR no está abierto"
+            exit 1
+          fi
+          
+          if [ "${{ github.event.pull_request.base.ref }}" != "main" ]; then
+            echo "❌ El PR no es hacia la rama main"
+            exit 1
+          fi
+          
+          # Hacer merge del PR
+          echo "🔄 Realizando merge del PR..."
+          
+          curl -X PUT \
+            -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+            -H "Accept: application/vnd.github.v3+json" \
+            "https://api.github.com/repos/${{ github.repository }}/pulls/${{ github.event.number }}/merge" \
+            -d '{
+              "commit_title": "Auto-merge: ${{ github.event.pull_request.title }}",
+              "commit_message": "Merged by automated workflow after successful validation.\n\nPR Author: ${{ github.event.pull_request.user.login }}\nValidation passed: ✅",
+              "merge_method": "squash"
+            }'
+            
+          if [ $? -eq 0 ]; then
+            echo "✅ PR mergeado exitosamente"
+            echo "🚀 El deployment se activará automáticamente en unos momentos"
+          else
+            echo "❌ Error al mergear el PR"
+            exit 1
+          fi
+          
+      - name: Comentar en el PR
+        if: success()
+        run: |
+          echo "💬 Agregando comentario de confirmación al PR..."
+          
+          curl -X POST \
+            -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+            -H "Accept: application/vnd.github.v3+json" \
+            "https://api.github.com/repos/${{ github.repository }}/issues/${{ github.event.number }}/comments" \
+            -d '{
+              "body": "🎉 **Auto-merge exitoso!**\n\n✅ Todas las validaciones pasaron correctamente\n🤖 PR mergeado automáticamente\n🚀 Tu contribución estará disponible en la página web en unos minutos\n\n¡Gracias por tu contribución! 🙌\n\n---\n*Este comentario fue generado automáticamente por el workflow de CI/CD*"
+            }'
