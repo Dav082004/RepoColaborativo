@@ -1,9 +1,5 @@
 # 🚀 Repo Colaborativo - ¡Únete a la Comunidad!
 
-![Contributors](https://img.shields.io/badge/contributors-2-blue)
-![GitHub Pages](https://img.shields.io/badge/github%20pages-deployed-success)
-![Last Updated](https://img.shields.io/badge/last%20updated-2025--08--01-green)
-
 Una página web colaborativa donde desarrolladores de todo el mundo pueden contribuir con su información personal y aprender sobre colaboración en proyectos open source.
 
 ## 🌟 Características
