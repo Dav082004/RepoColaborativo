@@ -43,7 +43,7 @@ const contributors = [
   },
   {
     name: "Octocat2", 
-    nickname: "gat1t0-ola", // ✅ Requerido
+    nickname: "gat1t2-ola", // ✅ Requerido
     github: "https://github.com/gat1t2-ola", // ✅ Requerido
     image: "https://github.com/gat1t3-ola.png", // ⭕ Opcional (se usa tu avatar de GitHub automáticamente o puedes poner una URL de imagen personalizada)
     description: "Soy un gato con 8 patas", // ✅ Requerido (máximo 150 caracteres)
