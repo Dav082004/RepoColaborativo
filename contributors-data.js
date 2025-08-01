@@ -27,7 +27,7 @@ const contributors = [
     nickname: "gat1t0-ola", // ✅ Requerido
     github: "https://github.com/gat1t0-ola", // ✅ Requerido
     image: "https://github.com/gat1t0-ola.png", // ⭕ Opcional (se usa tu avatar de GitHub automáticamente o puedes poner una URL de imagen personalizada)
-    description: "Soy un gato con 8 patas", // ✅ Requerido (máximo 150 caracteres)
+    description: "Soy un gato con 8 tentáculos", // ✅ Requerido (máximo 150 caracteres)
     hobbies: ["Programar"], // ✅ Requerido (máximo 4 hobbies)
   },
 
