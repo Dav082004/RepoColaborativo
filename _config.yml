@@ -1,0 +1,36 @@
+# GitHub Pages Configuration
+
+# Build settings
+theme: null
+plugins: []
+
+# Exclude unnecessary files from the build
+exclude:
+  - "*.md"
+  - ".github/"
+  - "node_modules/"
+  - "package*.json"
+  - ".gitignore"
+
+# Include important files
+include:
+  - "index.html"
+  - "styles.css"
+  - "script.js"
+  - "contributors.js"
+  - "contributors-data.js"
+  - "styles/"
+
+# Set the base URL (will be overridden by GitHub Pages)
+baseurl: "/RepoColaborativo"
+url: "https://dav082004.github.io"
+
+# Site metadata
+title: "Repo Colaborativo"
+description: "Una página web colaborativa donde desarrolladores pueden contribuir y aprender sobre colaboración en proyectos open source"
+author: "Dav082004"
+
+# GitHub Pages specific settings
+github:
+  repository_name: "RepoColaborativo"
+  repository_url: "https://github.com/Dav082004/RepoColaborativo"

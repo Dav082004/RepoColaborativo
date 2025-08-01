@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Participantes del Taller - GitHub Campus Experts</title>
+    <link rel="stylesheet" href="styles/global.css" />
+    <link rel="stylesheet" href="styles/index.css" />
+    <link
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+      rel="stylesheet" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap"
+      rel="stylesheet" />
+  </head>
+  <body>
+    <!-- Header -->
+    <header class="header">
+      <div class="header-container">
+        <div class="header-logos">
+          <a
+            href="https://docs.github.com/es/education/about-github-education/use-github-at-your-educational-institution/about-github-campus-experts"
+            target="_blank"
+            class="campus-experts-logo">
+            <img
+              src="assets/Github Campus Expert.png"
+              alt="GitHub Campus Experts"
+              class="campus-experts-img" />
+          </a>
+        </div>
+        <nav class="header-nav">
+          <a href="index.html" class="nav-link active">Inicio</a>
+          <a href="como-contribuir.html" class="nav-link">Cómo Contribuir</a>
+        </nav>
+        <div class="mobile-menu-toggle">
+          <span></span>
+          <span></span>
+          <span></span>
+        </div>
+      </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main-content">
+      <!-- Hero Section -->
+      <section id="inicio" class="hero-section">
+        <div class="hero-container">
+          <div class="hero-content">
+            <div class="hero-badge">
+              <i class="fas fa-code-branch"></i>
+              Espacio de práctica para contribuciones open source
+            </div>
+            <h1 class="hero-title">
+              Repo Colaborativo
+              <span class="hero-subtitle">Open Source Practice</span>
+            </h1>
+            <p class="hero-description">
+              Un espacio diseñado para que desarrolladores puedan practicar
+              contribuciones en repositorios open source. Aprende las mejores
+              prácticas de colaboración, control de versiones y flujo de trabajo
+              con Git y GitHub en un ambiente seguro y educativo.
+            </p>
+            <div class="hero-buttons">
+              <a href="#participantes" class="btn btn-primary">
+                <i class="fas fa-users"></i>
+                Ver Participantes
+              </a>
+              <a href="como-contribuir.html" class="btn btn-secondary">
+                <i class="fas fa-code-branch"></i>
+                Cómo Contribuir
+              </a>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Estadísticas -->
+      <section class="stats-section">
+        <div class="stats-container">
+          <div class="stat-item">
+            <div class="stat-number" id="contributors-count">0</div>
+            <div class="stat-label">Participantes</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Sección de participantes -->
+      <section id="participantes" class="participants-section">
+        <div class="participants-container">
+          <h2 class="section-title">
+            <i class="fas fa-users"></i>
+            Participantes del Taller
+          </h2>
+          <div class="participants-grid" id="contributors-grid">
+            <!-- Los participantes se cargarán dinámicamente desde contributors.js -->
+          </div>
+        </div>
+      </section>
+
+      <!-- Footer -->
+      <footer class="footer">
+        <div class="footer-container">
+          <div class="footer-content">
+            <div class="footer-left">
+              <div class="footer-logo">
+                <div>
+                  <p class="footer-description"><b>Dav082004🚩</b></p>
+                </div>
+              </div>
+              <p class="footer-description">
+                Proyecto colaborativo para aprender Git, GitHub y desarrollo web
+              </p>
+            </div>
+            <div class="footer-right">
+              <div class="footer-links">
+                <a
+                  href="https://github.com/Dav082004/RepoColaborativo"
+                  target="_blank">
+                  <i class="fab fa-github"></i>
+                  Repositorio
+                </a>
+              </div>
+              <p class="footer-credit">
+                <i class="fas fa-heart" style="color: #ff6b6b"></i>
+                Hecho con amor por la comunidad
+              </p>
+            </div>
+          </div>
+        </div>
+      </footer>
+    </main>
+
+    <script src="contributors-data.js"></script>
+    <script src="contributors.js"></script>
+  </body>
+</html>

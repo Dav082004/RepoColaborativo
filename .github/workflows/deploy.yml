@@ -1,0 +1,457 @@
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# Allow only one concurrent deployment, skipping runs queued between the run in-progress and latest queued.
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
+
+jobs:
+  # Trabajo de validación de datos
+  validate:
+    runs-on: ubuntu-latest
+    name: Validate Contributors Data
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "18"
+
+      - name: Validate Contributors Format
+        run: |
+          echo "🔍 Validando formato de contributors.js..."
+
+          # Verificar que el archivo existe
+          if [ ! -f "contributors.js" ]; then
+            echo "❌ Error: contributors.js no encontrado"
+            exit 1
+          fi
+
+          # Validar sintaxis JavaScript básica
+          node -c contributors.js
+          if [ $? -ne 0 ]; then
+            echo "❌ Error: Sintaxis JavaScript inválida en contributors.js"
+            exit 1
+          fi
+
+          echo "✅ Sintaxis JavaScript válida"
+
+          # Verificar estructura de datos usando Node.js
+          node -e "
+            const fs = require('fs');
+            const content = fs.readFileSync('contributors.js', 'utf8');
+            
+            // Extraer el array contributors del archivo
+            const contributorsMatch = content.match(/const contributors = (\[[\s\S]*?\]);/);
+            if (!contributorsMatch) {
+              console.log('❌ Error: No se encontró el array contributors');
+              process.exit(1);
+            }
+            
+            try {
+              const contributorsStr = contributorsMatch[1];
+              const contributors = eval(contributorsStr);
+              
+              if (!Array.isArray(contributors)) {
+                console.log('❌ Error: contributors debe ser un array');
+                process.exit(1);
+              }
+              
+              console.log(\`📊 Encontrados \${contributors.length} colaboradores\`);
+              
+              // Validar cada colaborador
+              contributors.forEach((contributor, index) => {
+                const errors = [];
+                
+                if (!contributor.name || typeof contributor.name !== 'string' || contributor.name.trim() === '') {
+                  errors.push('name es requerido y debe ser una cadena no vacía');
+                }
+                
+                if (!contributor.nickname || typeof contributor.nickname !== 'string' || contributor.nickname.trim() === '') {
+                  errors.push('nickname es requerido y debe ser una cadena no vacía');
+                }
+                
+                if (!contributor.github || typeof contributor.github !== 'string' || !contributor.github.startsWith('https://github.com/')) {
+                  errors.push('github es requerido y debe ser una URL válida de GitHub');
+                }
+                
+                if (!contributor.description || typeof contributor.description !== 'string' || contributor.description.trim() === '') {
+                  errors.push('description es requerido y debe ser una cadena no vacía');
+                }
+                
+                if (contributor.description && contributor.description.length > 200) {
+                  errors.push('description debe tener máximo 200 caracteres');
+                }
+                
+                if (!Array.isArray(contributor.hobbies) || contributor.hobbies.length === 0) {
+                  errors.push('hobbies debe ser un array con al menos un elemento');
+                }
+                
+                if (contributor.hobbies && contributor.hobbies.length > 4) {
+                  errors.push('máximo 4 hobbies permitidos');
+                }
+                
+                if (contributor.linkedin && (!contributor.linkedin.includes('linkedin.com') || !contributor.linkedin.startsWith('http'))) {
+                  errors.push('LinkedIn debe ser una URL válida que contenga linkedin.com');
+                }
+                
+                // Verificar duplicados de nickname
+                const duplicates = contributors.filter(c => c.nickname === contributor.nickname);
+                if (duplicates.length > 1) {
+                  errors.push(\`nickname '\${contributor.nickname}' está duplicado\`);
+                }
+                
+                // Verificar duplicados de GitHub
+                const duplicatesGithub = contributors.filter(c => c.github === contributor.github);
+                if (duplicatesGithub.length > 1) {
+                  errors.push(\`GitHub URL '\${contributor.github}' está duplicada\`);
+                }
+                
+                if (errors.length > 0) {
+                  console.log(\`❌ Colaborador \${index + 1} (\${contributor.name || 'Sin nombre'}): \${errors.join(', ')}\`);
+                  process.exit(1);
+                }
+                
+                console.log(\`✅ Colaborador \${index + 1}: \${contributor.name} (@\${contributor.nickname}) - OK\`);
+              });
+              
+              console.log('🎉 Todos los datos de colaboradores son válidos!');
+              
+            } catch (error) {
+              console.log('❌ Error al parsear contributors.js:', error.message);
+              process.exit(1);
+            }
+          "
+
+      - name: Check HTML Validity
+        run: |
+          echo "🔍 Validando HTML..."
+          if [ ! -f "index.html" ]; then
+            echo "❌ Error: index.html no encontrado"
+            exit 1
+          fi
+
+          # Verificación básica de HTML
+          if ! grep -q "<!DOCTYPE html>" index.html; then
+            echo "❌ Error: DOCTYPE HTML5 no encontrado"
+            exit 1
+          fi
+
+          if ! grep -q "<title>" index.html; then
+            echo "❌ Error: Tag title no encontrado"
+            exit 1
+          fi
+
+          echo "✅ HTML básico válido"
+
+      - name: Check Required Files
+        run: |
+          echo "🔍 Verificando archivos requeridos..."
+
+          required_files=("index.html" "styles.css" "script.js" "contributors.js")
+
+          for file in "${required_files[@]}"; do
+            if [ ! -f "$file" ]; then
+              echo "❌ Error: Archivo requerido $file no encontrado"
+              exit 1
+            else
+              echo "✅ $file encontrado"
+            fi
+          done
+
+          echo "🎉 Todos los archivos requeridos están presentes"
+
+  # Trabajo de construcción y despliegue
+  build-and-deploy:
+    needs: validate
+    runs-on: ubuntu-latest
+    name: Build and Deploy
+    if: github.ref == 'refs/heads/main'
+
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Pages
+        uses: actions/configure-pages@v4
+
+      - name: Generate Build Info
+        run: |
+          echo "📝 Generando información de build..."
+
+          # Crear archivo de información de build
+          cat > build-info.json << EOF
+          {
+            "buildTime": "$(date -u +"%Y-%m-%dT%H:%M:%SZ")",
+            "commit": "${{ github.sha }}",
+            "branch": "${{ github.ref_name }}",
+            "contributor": "${{ github.actor }}",
+            "repository": "${{ github.repository }}"
+          }
+          EOF
+
+          echo "✅ Información de build generada"
+
+      - name: Inject Build Info into HTML
+        run: |
+          echo "🔧 Inyectando información de build en HTML..."
+
+          # Leer información de build
+          BUILD_INFO=$(cat build-info.json)
+
+          # Crear script para inyectar en HTML
+          cat > inject-build-info.js << 'EOF'
+          const fs = require('fs');
+          const buildInfo = JSON.parse(fs.readFileSync('build-info.json', 'utf8'));
+
+          let html = fs.readFileSync('index.html', 'utf8');
+
+          // Inyectar información de build como comentario
+          const buildComment = `
+          <!-- 
+          Build Information:
+          - Build Time: ${buildInfo.buildTime}
+          - Commit: ${buildInfo.commit}
+          - Branch: ${buildInfo.branch}
+          - Last Contributor: ${buildInfo.contributor}
+          - Repository: ${buildInfo.repository}
+          -->`;
+
+          html = html.replace('</head>', buildComment + '\n</head>');
+
+          // Inyectar script con información de build
+          const buildScript = `
+          <script>
+            window.BUILD_INFO = ${JSON.stringify(buildInfo)};
+            console.log('🚀 Build Info:', window.BUILD_INFO);
+          </script>`;
+
+          html = html.replace('</body>', buildScript + '\n</body>');
+
+          fs.writeFileSync('index.html', html);
+          console.log('✅ Información de build inyectada en HTML');
+          EOF
+
+          node inject-build-info.js
+
+      - name: Update Contributors Count
+        run: |
+          echo "📊 Actualizando estadísticas de colaboradores..."
+
+          # Contar colaboradores
+          CONTRIBUTORS_COUNT=$(node -e "
+            const fs = require('fs');
+            const content = fs.readFileSync('contributors.js', 'utf8');
+            const contributorsMatch = content.match(/const contributors = (\[[\s\S]*?\]);/);
+            if (contributorsMatch) {
+              const contributors = eval(contributorsMatch[1]);
+              console.log(contributors.length);
+            } else {
+              console.log(0);
+            }
+          ")
+
+          echo "👥 Colaboradores encontrados: $CONTRIBUTORS_COUNT"
+
+          # Actualizar README con estadísticas
+          if [ -f "README.md" ]; then
+            # Agregar badge de colaboradores si no existe
+            if ! grep -q "contributors-" README.md; then
+              sed -i '1a\\n![Contributors](https://img.shields.io/badge/contributors-'$CONTRIBUTORS_COUNT'-blue)\n![GitHub Pages](https://img.shields.io/badge/github%20pages-deployed-success)\n![Last Updated](https://img.shields.io/badge/last%20updated-'$(date +%Y--%m--%d)'-green)\n' README.md
+            fi
+          fi
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: "."
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
+
+      - name: Success Notification
+        run: |
+          echo "🎉 ¡Despliegue exitoso!"
+          echo "🌐 Sitio web disponible en: ${{ steps.deployment.outputs.page_url }}"
+          echo "👥 Colaboradores actuales: $(node -e "
+            const fs = require('fs');
+            const content = fs.readFileSync('contributors.js', 'utf8');
+            const contributorsMatch = content.match(/const contributors = (\[[\s\S]*?\]);/);
+            if (contributorsMatch) {
+              const contributors = eval(contributorsMatch[1]);
+              console.log(contributors.length);
+            }
+          ")"
+
+  # Trabajo para PRs - Solo validación
+  validate-pr:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    name: Validate Pull Request
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "18"
+
+      - name: PR Validation
+        run: |
+          echo "🔍 Validando Pull Request de ${{ github.actor }}..."
+
+          # Verificar que solo se modificó contributors.js
+          git fetch origin main
+          CHANGED_FILES=$(git diff --name-only origin/main...HEAD)
+
+          echo "📝 Archivos modificados:"
+          echo "$CHANGED_FILES"
+
+          # Permitir cambios solo en contributors.js y archivos de documentación
+          ALLOWED_PATTERN="^(contributors\.js|README\.md|\.github/.*|docs/.*)$"
+
+          while IFS= read -r file; do
+            if [[ ! "$file" =~ $ALLOWED_PATTERN ]]; then
+              echo "❌ Error: No se permite modificar $file"
+              echo "💡 Solo puedes modificar contributors.js para agregar tu información"
+              exit 1
+            fi
+          done <<< "$CHANGED_FILES"
+
+          # Validar que se agregó exactamente un colaborador
+          if echo "$CHANGED_FILES" | grep -q "contributors.js"; then
+            echo "✅ contributors.js fue modificado"
+            
+            # Validar el formato del nuevo colaborador
+            node -e "
+              const fs = require('fs');
+              const { execSync } = require('child_process');
+              
+              try {
+                // Obtener la versión actual
+                const currentContent = fs.readFileSync('contributors.js', 'utf8');
+                const currentMatch = currentContent.match(/const contributors = (\[[\s\S]*?\]);/);
+                const currentContributors = currentMatch ? eval(currentMatch[1]) : [];
+                
+                // Obtener la versión de main
+                execSync('git show origin/main:contributors.js > /tmp/main-contributors.js');
+                const mainContent = fs.readFileSync('/tmp/main-contributors.js', 'utf8');
+                const mainMatch = mainContent.match(/const contributors = (\[[\s\S]*?\]);/);
+                const mainContributors = mainMatch ? eval(mainMatch[1]) : [];
+                
+                const newContributorsCount = currentContributors.length - mainContributors.length;
+                
+                if (newContributorsCount <= 0) {
+                  console.log('❌ Error: No se detectaron nuevos colaboradores');
+                  process.exit(1);
+                }
+                
+                if (newContributorsCount > 1) {
+                  console.log('❌ Error: Solo puedes agregar un colaborador por PR');
+                  console.log(\`   Colaboradores agregados: \${newContributorsCount}\`);
+                  process.exit(1);
+                }
+                
+                // Encontrar el nuevo colaborador
+                const newContributor = currentContributors.find(c => 
+                  !mainContributors.some(m => m.nickname === c.nickname)
+                );
+                
+                if (newContributor) {
+                  console.log(\`✅ Nuevo colaborador detectado: \${newContributor.name} (@\${newContributor.nickname})\`);
+                  console.log(\`   Hobbies: \${newContributor.hobbies.join(', ')}\`);
+                  if (newContributor.linkedin) {
+                    console.log(\`   LinkedIn: \${newContributor.linkedin}\`);
+                  }
+                } else {
+                  console.log('❌ Error: No se pudo identificar el nuevo colaborador');
+                  process.exit(1);
+                }
+                
+              } catch (error) {
+                console.log('❌ Error al validar colaboradores:', error.message);
+                process.exit(1);
+              }
+            "
+          else
+            echo "ℹ️  contributors.js no fue modificado en este PR"
+          fi
+
+          echo "🎉 Pull Request válido!"
+
+      - name: Run Full Validation
+        run: |
+          # Ejecutar la misma validación que en el job principal
+          echo "🔍 Ejecutando validación completa..."
+
+          # Validar sintaxis JavaScript
+          node -c contributors.js
+
+          # Validar estructura de datos
+          node -e "
+            const fs = require('fs');
+            const content = fs.readFileSync('contributors.js', 'utf8');
+            const contributorsMatch = content.match(/const contributors = (\[[\s\S]*?\]);/);
+            if (!contributorsMatch) {
+              console.log('❌ Error: No se encontró el array contributors');
+              process.exit(1);
+            }
+            
+            const contributors = eval(contributorsMatch[1]);
+            
+            contributors.forEach((contributor, index) => {
+              const errors = [];
+              
+              if (!contributor.name || typeof contributor.name !== 'string' || contributor.name.trim() === '') {
+                errors.push('name es requerido');
+              }
+              
+              if (!contributor.nickname || typeof contributor.nickname !== 'string' || contributor.nickname.trim() === '') {
+                errors.push('nickname es requerido');
+              }
+              
+              if (!Array.isArray(contributor.hobbies) || contributor.hobbies.length === 0) {
+                errors.push('hobbies debe tener al menos un elemento');
+              }
+              
+              if (contributor.hobbies && contributor.hobbies.length > 4) {
+                errors.push('máximo 4 hobbies permitidos');
+              }
+              
+              if (contributor.linkedin && (!contributor.linkedin.includes('linkedin.com') || !contributor.linkedin.startsWith('http'))) {
+                errors.push('LinkedIn debe ser una URL válida');
+              }
+              
+              if (errors.length > 0) {
+                console.log(\`❌ Colaborador \${index + 1}: \${errors.join(', ')}\`);
+                process.exit(1);
+              }
+            });
+            
+            console.log('✅ Todos los datos son válidos');
+          "
+
+      - name: PR Success Message
+        run: |
+          echo "🎉 ¡Pull Request listo para merge!"
+          echo "✅ Todas las validaciones pasaron correctamente"
+          echo "🤖 El merge y despliegue se realizará automáticamente tras la aprobación"

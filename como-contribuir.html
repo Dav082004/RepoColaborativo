@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Cómo Contribuir - GitHub Campus Experts</title>
+    <link rel="stylesheet" href="styles/global.css" />
+    <link rel="stylesheet" href="styles/como-contribuir.css" />
+    <link
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+      rel="stylesheet" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap"
+      rel="stylesheet" />
+  </head>
+  <body>
+    <!-- Header -->
+    <header class="header">
+      <div class="header-container">
+        <div class="header-logos">
+          <a
+            href="https://docs.github.com/es/education/about-github-education/use-github-at-your-educational-institution/about-github-campus-experts"
+            target="_blank"
+            class="campus-experts-logo">
+            <img
+              src="assets/Github Campus Expert.png"
+              alt="GitHub Campus Experts"
+              class="campus-experts-img" />
+          </a>
+        </div>
+        <nav class="header-nav">
+          <a href="index.html" class="nav-link">Inicio</a>
+          <a href="como-contribuir.html" class="nav-link active"
+            >Cómo Contribuir</a
+          >
+        </nav>
+        <div class="mobile-menu-toggle">
+          <span></span>
+          <span></span>
+          <span></span>
+        </div>
+      </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main-content">
+      <!-- Hero Section -->
+      <section class="hero-section contribute-hero">
+        <div class="hero-container">
+          <div class="hero-content">
+            <div class="hero-badge">
+              <i class="fas fa-rocket"></i>
+              Guía de Contribución
+            </div>
+            <h1 class="hero-title">
+              ¿Cómo Contribuir?
+              <span class="hero-subtitle">Paso a Paso</span>
+            </h1>
+            <p class="hero-description">
+              Aprende a contribuir a este proyecto colaborativo y forma parte de
+              nuestra comunidad de desarrolladores. Sigue estos simples pasos
+              para agregar tu información al directorio.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <!-- Instrucciones para contribuir -->
+      <section class="contribute-section">
+        <div class="contribute-container">
+          <div class="steps-container">
+            <div class="step">
+              <div class="step-number">1</div>
+              <div class="step-content">
+                <h3><i class="fas fa-code-branch"></i> Fork el Repositorio</h3>
+                <p>
+                  Haz un fork de este repositorio a tu cuenta de GitHub haciendo
+                  clic en el botón "Fork" en la página del repositorio.
+                </p>
+                <div class="code-example">
+                  <pre><code># Clona tu fork
+git clone https://github.com/TU_USUARIO/RepoColaborativo.git
+cd RepoColaborativo</code></pre>
+                </div>
+              </div>
+            </div>
+
+            <div class="step">
+              <div class="step-number">2</div>
+              <div class="step-content">
+                <h3><i class="fas fa-edit"></i> Agrega tus Datos</h3>
+                <p>
+                  Edita el archivo <code>contributors.js</code> y agrega tu
+                  información al final del array.
+                </p>
+                <div class="code-example">
+                  <pre><code>{
+  name: "Tu Nombre Completo",
+  nickname: "tu_github_username",
+  github: "https://github.com/tu_username", // Requerido
+  linkedin: "https://linkedin.com/in/tu-perfil", // Opcional
+  description: "Una breve descripción sobre ti y tu especialidad", // Requerido
+  image: "https://tu-url-de-imagen.com/imagen.jpg", // Opcional
+  hobbies: ["Programación", "Gaming", "Música", "Deportes"] // Máximo 4
+},</code></pre>
+                </div>
+                <div class="info-box">
+                  <h4><i class="fas fa-info-circle"></i> Campos Requeridos:</h4>
+                  <ul>
+                    <li><strong>name:</strong> Tu nombre completo</li>
+                    <li><strong>nickname:</strong> Tu username de GitHub</li>
+                    <li>
+                      <strong>github:</strong> URL completa de tu perfil de
+                      GitHub
+                    </li>
+                    <li>
+                      <strong>description:</strong> Breve descripción sobre ti
+                      (máximo 150 caracteres)
+                    </li>
+                    <li>
+                      <strong>hobbies:</strong> Array con tus hobbies (máximo 4)
+                    </li>
+                  </ul>
+                  <h4><i class="fas fa-star"></i> Campos Opcionales:</h4>
+                  <ul>
+                    <li>
+                      <strong>linkedin:</strong> URL de tu perfil de LinkedIn
+                    </li>
+                    <li>
+                      <strong>image:</strong> URL de tu imagen de perfil
+                      personalizada
+                    </li>
+                  </ul>
+                  <div class="info-box warning">
+                    <h4>
+                      <i class="fas fa-camera"></i> Sobre las Imágenes de
+                      Perfil:
+                    </h4>
+                    <ul>
+                      <li>
+                        Si no proporcionas una imagen, se usará automáticamente
+                        tu avatar de GitHub
+                      </li>
+                      <li>
+                        Si tu imagen personalizada falla al cargar, se mostrará
+                        tu avatar de GitHub como respaldo
+                      </li>
+                      <li>
+                        Si no tienes GitHub, se mostrarán tus iniciales con un
+                        color único
+                      </li>
+                      <li>Formatos recomendados: JPG, PNG, WebP</li>
+                      <li>
+                        Tamaño recomendado: 200x200px o mayor (se ajustará
+                        automáticamente)
+                      </li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="step">
+              <div class="step-number">3</div>
+              <div class="step-content">
+                <h3>
+                  <i class="fas fa-git-alt"></i> Crea una Rama y Haz Commit
+                </h3>
+                <p>
+                  Crea una nueva rama para tus cambios y haz commit con un
+                  mensaje descriptivo.
+                </p>
+                <div class="code-example">
+                  <pre><code># Crea una nueva rama
+git checkout -b feat/add-tu-nickname
+
+# Agrega los cambios
+git add contributors.js
+
+# Haz commit con el formato correcto
+git commit -m "feat: add [tu_nickname] to contributors"
+
+# Envía los cambios a tu fork
+git push origin feat/add-tu-nickname</code></pre>
+                </div>
+              </div>
+            </div>
+
+            <div class="step">
+              <div class="step-number">4</div>
+              <div class="step-content">
+                <h3><i class="fas fa-paper-plane"></i> Crea un Pull Request</h3>
+                <p>
+                  Ve a GitHub y crea un Pull Request desde tu fork al
+                  repositorio original.
+                </p>
+                <div class="info-box">
+                  <h4><i class="fas fa-check-circle"></i> Título del PR:</h4>
+                  <p><code>feat: add [tu_nickname] to contributors</code></p>
+                  <h4>
+                    <i class="fas fa-align-left"></i> Descripción sugerida:
+                  </h4>
+                  <p>
+                    Agrega una breve descripción de lo que estás agregando, por
+                    ejemplo:
+                  </p>
+                  <code
+                    >"Agregando mi información al directorio de participantes
+                    del taller GitHub Campus Experts."</code
+                  >
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Sección de validaciones automáticas -->
+      <section class="validation-section">
+        <div class="validation-container">
+          <h2 class="section-title">
+            <i class="fas fa-robot"></i>
+            Sistema de Validación Automática
+          </h2>
+          <div class="validation-grid">
+            <div class="validation-item">
+              <div class="validation-icon success">
+                <i class="fas fa-check"></i>
+              </div>
+              <h3>Validación de Formato</h3>
+              <p>
+                El sistema verifica que el formato de tu contribución sea
+                correcto y que todos los campos requeridos estén presentes.
+              </p>
+            </div>
+            <div class="validation-item">
+              <div class="validation-icon info">
+                <i class="fas fa-sync"></i>
+              </div>
+              <h3>Auto-merge</h3>
+              <p>
+                Si todas las validaciones pasan, tu PR será automáticamente
+                mergeado y aparecerás en la página principal.
+              </p>
+            </div>
+            <div class="validation-item">
+              <div class="validation-icon warning">
+                <i class="fas fa-exclamation-triangle"></i>
+              </div>
+              <h3>Corrección de Errores</h3>
+              <p>
+                Si hay errores, recibirás comentarios específicos sobre qué
+                corregir. Puedes hacer nuevos commits para solucionarlos.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Sección de ejemplos -->
+      <section class="examples-section">
+        <div class="examples-container">
+          <h2 class="section-title">
+            <i class="fas fa-code"></i>
+            Ejemplos de Contribución
+          </h2>
+          <div class="examples-grid">
+            <div class="example-item">
+              <h3>
+                <i class="fas fa-check-circle" style="color: #10b981"></i>
+                Ejemplo Correcto
+              </h3>
+              <div class="code-example">
+                <pre><code>{
+  name: "Ana María González",
+  nickname: "anagonzalez",
+  github: "https://github.com/anagonzalez",
+  linkedin: "https://linkedin.com/in/ana-gonzalez-dev",
+  description: "Estudiante de Ingeniería de Sistemas especializada en desarrollo web",
+  hobbies: ["Programación", "Lectura", "Yoga", "Fotografía"]
+},</code></pre>
+              </div>
+            </div>
+            <div class="example-item">
+              <h3>
+                <i class="fas fa-times-circle" style="color: #ef4444"></i>
+                Errores Comunes
+              </h3>
+              <div class="error-list">
+                <div class="error-item">
+                  <i class="fas fa-times"></i>
+                  <span>Falta la coma al final del objeto</span>
+                </div>
+                <div class="error-item">
+                  <i class="fas fa-times"></i>
+                  <span>URL de GitHub incompleta o incorrecta</span>
+                </div>
+                <div class="error-item">
+                  <i class="fas fa-times"></i>
+                  <span>Más de 4 hobbies en el array</span>
+                </div>
+                <div class="error-item">
+                  <i class="fas fa-times"></i>
+                  <span
+                    >Descripción demasiado larga (más de 150 caracteres)</span
+                  >
+                </div>
+                <div class="error-item">
+                  <i class="fas fa-times"></i>
+                  <span>Nickname duplicado (ya existe en el sistema)</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Footer -->
+      <footer class="footer">
+        <div class="footer-container">
+          <div class="footer-content">
+            <div class="footer-left">
+              <div class="footer-logo">
+                <div>
+                  <p class="footer-description"><b>Dav082004🚩</b></p>
+                </div>
+              </div>
+              <p class="footer-description">
+                Proyecto colaborativo para aprender Git, GitHub y desarrollo web
+              </p>
+            </div>
+            <div class="footer-right">
+              <div class="footer-links">
+                <a
+                  href="https://github.com/Dav082004/RepoColaborativo"
+                  target="_blank">
+                  <i class="fab fa-github"></i>
+                  Repositorio
+                </a>
+                <a href="index.html">
+                  <i class="fas fa-home"></i>
+                  Volver al Inicio
+                </a>
+              </div>
+              <p class="footer-credit">
+                <i class="fas fa-heart" style="color: #ff6b6b"></i>
+                Hecho con amor por la comunidad
+              </p>
+            </div>
+          </div>
+        </div>
+      </footer>
+    </main>
+
+    <script src="script.js"></script>
+  </body>
+</html>
