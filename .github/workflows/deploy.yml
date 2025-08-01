@@ -11,16 +11,14 @@ permissions:
   pages: write
   id-token: write
 
-# Allow only one concurrent deployment, skipping runs queued between the run in-progress and latest queued.
 concurrency:
   group: "pages"
   cancel-in-progress: false
 
 jobs:
-  # Trabajo de validación de datos
+  # Validación de archivos
   validate:
     runs-on: ubuntu-latest
-    name: Validate Contributors Data
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -30,44 +28,41 @@ jobs:
         with:
           node-version: "18"
 
-      - name: Validate Contributors Format
+      - name: Validate contributors data
         run: |
-          echo "🔍 Validando formato de contributors.js..."
+          echo "Validando estructura de contributors-data.js..."
 
           # Verificar que el archivo existe
-          if [ ! -f "contributors.js" ]; then
-            echo "❌ Error: contributors.js no encontrado"
+          if [ ! -f "contributors-data.js" ]; then
+            echo "❌ Error: contributors-data.js no encontrado"
             exit 1
           fi
 
-          # Validar sintaxis JavaScript básica
-          node -c contributors.js
-          if [ $? -ne 0 ]; then
-            echo "❌ Error: Sintaxis JavaScript inválida en contributors.js"
-            exit 1
-          fi
-
-          echo "✅ Sintaxis JavaScript válida"
-
-          # Verificar estructura de datos usando Node.js
+          # Verificar sintaxis JavaScript básica
           node -e "
-            const fs = require('fs');
-            const content = fs.readFileSync('contributors.js', 'utf8');
-            
-            // Extraer el array contributors del archivo
-            const contributorsMatch = content.match(/const contributors = (\[[\s\S]*?\]);/);
-            if (!contributorsMatch) {
-              console.log('❌ Error: No se encontró el array contributors');
-              process.exit(1);
-            }
-            
             try {
-              const contributorsStr = contributorsMatch[1];
-              const contributors = eval(contributorsStr);
+              const fs = require('fs');
+              const content = fs.readFileSync('contributors-data.js', 'utf8');
+              
+              // Verificar que contiene la estructura básica esperada
+              if (!content.includes('const contributors')) {
+                throw new Error('No se encontró la declaración de contributors');
+              }
+              
+              if (!content.includes('module.exports')) {
+                throw new Error('No se encontró module.exports');
+              }
+              
+              // Evaluar el archivo para verificar sintaxis
+              const contributorsMatch = content.match(/const contributors = (\[[\s\S]*?\]);/);
+              if (!contributorsMatch) {
+                throw new Error('No se encontró el array contributors válido');
+              }
+              
+              const contributors = eval(contributorsMatch[1]);
               
               if (!Array.isArray(contributors)) {
-                console.log('❌ Error: contributors debe ser un array');
-                process.exit(1);
+                throw new Error('contributors debe ser un array');
               }
               
               console.log(\`📊 Encontrados \${contributors.length} colaboradores\`);
@@ -128,63 +123,77 @@ jobs:
                 console.log(\`✅ Colaborador \${index + 1}: \${contributor.name} (@\${contributor.nickname}) - OK\`);
               });
               
-              console.log('🎉 Todos los datos de colaboradores son válidos!');
-              
+              console.log('✅ contributors-data.js tiene estructura válida');
             } catch (error) {
-              console.log('❌ Error al parsear contributors.js:', error.message);
+              console.error('❌ Error en contributors-data.js:', error.message);
               process.exit(1);
             }
           "
 
-      - name: Check HTML Validity
+      - name: Validate HTML files
         run: |
-          echo "🔍 Validando HTML..."
-          if [ ! -f "index.html" ]; then
-            echo "❌ Error: index.html no encontrado"
-            exit 1
-          fi
+          echo "Validando archivos HTML..."
 
-          # Verificación básica de HTML
-          if ! grep -q "<!DOCTYPE html>" index.html; then
-            echo "❌ Error: DOCTYPE HTML5 no encontrado"
-            exit 1
-          fi
-
-          if ! grep -q "<title>" index.html; then
-            echo "❌ Error: Tag title no encontrado"
-            exit 1
-          fi
-
-          echo "✅ HTML básico válido"
-
-      - name: Check Required Files
-        run: |
-          echo "🔍 Verificando archivos requeridos..."
-
-          required_files=("index.html" "styles.css" "script.js" "contributors.js")
-
-          for file in "${required_files[@]}"; do
+          # Verificar archivos HTML principales
+          for file in index.html como-contribuir.html; do
             if [ ! -f "$file" ]; then
-              echo "❌ Error: Archivo requerido $file no encontrado"
+              echo "❌ Error: $file no encontrado"
               exit 1
-            else
-              echo "✅ $file encontrado"
             fi
+            
+            # Verificar sintaxis HTML básica
+            if ! grep -q "<!DOCTYPE html>" "$file"; then
+              echo "❌ Error: $file no tiene DOCTYPE válido"
+              exit 1
+            fi
+            
+            echo "✅ $file es válido"
           done
 
-          echo "🎉 Todos los archivos requeridos están presentes"
+      - name: Validate JavaScript files
+        run: |
+          echo "Validando archivos JavaScript..."
 
-  # Trabajo de construcción y despliegue
-  build-and-deploy:
-    needs: validate
-    runs-on: ubuntu-latest
-    name: Build and Deploy
-    if: github.ref == 'refs/heads/main'
+          # Verificar archivos JS en la carpeta js/
+          for file in js/contributors.js js/script.js; do
+            if [ ! -f "$file" ]; then
+              echo "❌ Error: $file no encontrado"
+              exit 1
+            fi
+            
+            # Verificar sintaxis JavaScript básica
+            node -c "$file"
+            echo "✅ $file tiene sintaxis válida"
+          done
 
+      - name: Validate CSS files
+        run: |
+          echo "Validando archivos CSS..."
+
+          # Verificar que los archivos CSS existen
+          for file in styles/como-contribuir.css; do
+            if [ ! -f "$file" ]; then
+              echo "❌ Error: $file no encontrado"
+              exit 1
+            fi
+            
+            # Verificar que el archivo no está vacío
+            if [ ! -s "$file" ]; then
+              echo "❌ Error: $file está vacío"
+              exit 1
+            fi
+            
+            echo "✅ $file es válido"
+          done
+
+  # Deploy a GitHub Pages
+  deploy:
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
-
+    runs-on: ubuntu-latest
+    needs: validate
+    if: github.ref == 'refs/heads/main'
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -192,120 +201,73 @@ jobs:
       - name: Setup Pages
         uses: actions/configure-pages@v4
 
-      - name: Generate Build Info
+      - name: Prepare deployment
         run: |
-          echo "📝 Generando información de build..."
+          echo "Preparando archivos para deployment..."
 
-          # Crear archivo de información de build
-          cat > build-info.json << EOF
-          {
-            "buildTime": "$(date -u +"%Y-%m-%dT%H:%M:%SZ")",
-            "commit": "${{ github.sha }}",
-            "branch": "${{ github.ref_name }}",
-            "contributor": "${{ github.actor }}",
-            "repository": "${{ github.repository }}"
-          }
-          EOF
+          # Crear directorio de build
+          mkdir -p _site
 
-          echo "✅ Información de build generada"
+          # Copiar archivos principales
+          cp index.html _site/
+          cp como-contribuir.html _site/
+          cp contributors-data.js _site/
 
-      - name: Inject Build Info into HTML
-        run: |
-          echo "🔧 Inyectando información de build en HTML..."
+          # Copiar directorios
+          cp -r js/ _site/js/
+          cp -r styles/ _site/styles/
 
-          # Leer información de build
-          BUILD_INFO=$(cat build-info.json)
-
-          # Crear script para inyectar en HTML
-          cat > inject-build-info.js << 'EOF'
-          const fs = require('fs');
-          const buildInfo = JSON.parse(fs.readFileSync('build-info.json', 'utf8'));
-
-          let html = fs.readFileSync('index.html', 'utf8');
-
-          // Inyectar información de build como comentario
-          const buildComment = `
-          <!-- 
-          Build Information:
-          - Build Time: ${buildInfo.buildTime}
-          - Commit: ${buildInfo.commit}
-          - Branch: ${buildInfo.branch}
-          - Last Contributor: ${buildInfo.contributor}
-          - Repository: ${buildInfo.repository}
-          -->`;
-
-          html = html.replace('</head>', buildComment + '\n</head>');
-
-          // Inyectar script con información de build
-          const buildScript = `
-          <script>
-            window.BUILD_INFO = ${JSON.stringify(buildInfo)};
-            console.log('🚀 Build Info:', window.BUILD_INFO);
-          </script>`;
-
-          html = html.replace('</body>', buildScript + '\n</body>');
-
-          fs.writeFileSync('index.html', html);
-          console.log('✅ Información de build inyectada en HTML');
-          EOF
-
-          node inject-build-info.js
-
-      - name: Update Contributors Count
-        run: |
-          echo "📊 Actualizando estadísticas de colaboradores..."
-
-          # Contar colaboradores
-          CONTRIBUTORS_COUNT=$(node -e "
-            const fs = require('fs');
-            const content = fs.readFileSync('contributors.js', 'utf8');
-            const contributorsMatch = content.match(/const contributors = (\[[\s\S]*?\]);/);
-            if (contributorsMatch) {
-              const contributors = eval(contributorsMatch[1]);
-              console.log(contributors.length);
-            } else {
-              console.log(0);
-            }
-          ")
-
-          echo "👥 Colaboradores encontrados: $CONTRIBUTORS_COUNT"
-
-          # Actualizar README con estadísticas
-          if [ -f "README.md" ]; then
-            # Agregar badge de colaboradores si no existe
-            if ! grep -q "contributors-" README.md; then
-              sed -i '1a\\n![Contributors](https://img.shields.io/badge/contributors-'$CONTRIBUTORS_COUNT'-blue)\n![GitHub Pages](https://img.shields.io/badge/github%20pages-deployed-success)\n![Last Updated](https://img.shields.io/badge/last%20updated-'$(date +%Y--%m--%d)'-green)\n' README.md
-            fi
+          # Copiar assets si existen
+          if [ -d "assets" ]; then
+            cp -r assets/ _site/assets/
           fi
+
+          # Copiar imágenes si existen
+          if [ -d "images" ]; then
+            cp -r images/ _site/images/
+          fi
+
+          # Crear archivo .nojekyll para evitar procesamiento de Jekyll
+          touch _site/.nojekyll
+
+          echo "✅ Archivos preparados para deployment"
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: "."
+          path: "_site"
 
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
 
-      - name: Success Notification
+  # Verificación post-deploy (solo en main)
+  verify:
+    runs-on: ubuntu-latest
+    needs: deploy
+    if: github.ref == 'refs/heads/main'
+    steps:
+      - name: Verify deployment
         run: |
-          echo "🎉 ¡Despliegue exitoso!"
-          echo "🌐 Sitio web disponible en: ${{ steps.deployment.outputs.page_url }}"
-          echo "👥 Colaboradores actuales: $(node -e "
-            const fs = require('fs');
-            const content = fs.readFileSync('contributors.js', 'utf8');
-            const contributorsMatch = content.match(/const contributors = (\[[\s\S]*?\]);/);
-            if (contributorsMatch) {
-              const contributors = eval(contributorsMatch[1]);
-              console.log(contributors.length);
-            }
-          ")"
+          echo "Verificando deployment..."
 
-  # Trabajo para PRs - Solo validación
+          # Esperar un momento para que el deployment esté disponible
+          sleep 30
+
+          # Verificar que la página principal responde
+          if curl -f -s "https://${{ github.repository_owner }}.github.io/RepoColaborativo/" > /dev/null; then
+            echo "✅ Página principal accessible"
+          else
+            echo "❌ Error: Página principal no accessible"
+            exit 1
+          fi
+
+          echo "✅ Deployment verificado exitosamente"
+
+  # Validación para Pull Requests
   validate-pr:
     if: github.event_name == 'pull_request'
     runs-on: ubuntu-latest
-    name: Validate Pull Request
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -319,27 +281,27 @@ jobs:
         run: |
           echo "🔍 Validando Pull Request de ${{ github.actor }}..."
 
-          # Verificar que solo se modificó contributors.js
+          # Verificar que solo se modificó contributors-data.js
           git fetch origin main
           CHANGED_FILES=$(git diff --name-only origin/main...HEAD)
 
           echo "📝 Archivos modificados:"
           echo "$CHANGED_FILES"
 
-          # Permitir cambios solo en contributors.js y archivos de documentación
-          ALLOWED_PATTERN="^(contributors\.js|README\.md|\.github/.*|docs/.*)$"
+          # Permitir cambios solo en contributors-data.js y archivos de documentación
+          ALLOWED_PATTERN="^(contributors-data\.js|README\.md|\.github/.*|docs/.*)$"
 
           while IFS= read -r file; do
             if [[ ! "$file" =~ $ALLOWED_PATTERN ]]; then
               echo "❌ Error: No se permite modificar $file"
-              echo "💡 Solo puedes modificar contributors.js para agregar tu información"
+              echo "💡 Solo puedes modificar contributors-data.js para agregar tu información"
               exit 1
             fi
           done <<< "$CHANGED_FILES"
 
           # Validar que se agregó exactamente un colaborador
-          if echo "$CHANGED_FILES" | grep -q "contributors.js"; then
-            echo "✅ contributors.js fue modificado"
+          if echo "$CHANGED_FILES" | grep -q "contributors-data.js"; then
+            echo "✅ contributors-data.js fue modificado"
             
             # Validar el formato del nuevo colaborador
             node -e "
@@ -348,12 +310,12 @@ jobs:
               
               try {
                 // Obtener la versión actual
-                const currentContent = fs.readFileSync('contributors.js', 'utf8');
+                const currentContent = fs.readFileSync('contributors-data.js', 'utf8');
                 const currentMatch = currentContent.match(/const contributors = (\[[\s\S]*?\]);/);
                 const currentContributors = currentMatch ? eval(currentMatch[1]) : [];
                 
                 // Obtener la versión de main
-                execSync('git show origin/main:contributors.js > /tmp/main-contributors.js');
+                execSync('git show origin/main:contributors-data.js > /tmp/main-contributors.js');
                 const mainContent = fs.readFileSync('/tmp/main-contributors.js', 'utf8');
                 const mainMatch = mainContent.match(/const contributors = (\[[\s\S]*?\]);/);
                 const mainContributors = mainMatch ? eval(mainMatch[1]) : [];
@@ -393,65 +355,7 @@ jobs:
               }
             "
           else
-            echo "ℹ️  contributors.js no fue modificado en este PR"
+            echo "ℹ️  contributors-data.js no fue modificado en este PR"
           fi
 
           echo "🎉 Pull Request válido!"
-
-      - name: Run Full Validation
-        run: |
-          # Ejecutar la misma validación que en el job principal
-          echo "🔍 Ejecutando validación completa..."
-
-          # Validar sintaxis JavaScript
-          node -c contributors.js
-
-          # Validar estructura de datos
-          node -e "
-            const fs = require('fs');
-            const content = fs.readFileSync('contributors.js', 'utf8');
-            const contributorsMatch = content.match(/const contributors = (\[[\s\S]*?\]);/);
-            if (!contributorsMatch) {
-              console.log('❌ Error: No se encontró el array contributors');
-              process.exit(1);
-            }
-            
-            const contributors = eval(contributorsMatch[1]);
-            
-            contributors.forEach((contributor, index) => {
-              const errors = [];
-              
-              if (!contributor.name || typeof contributor.name !== 'string' || contributor.name.trim() === '') {
-                errors.push('name es requerido');
-              }
-              
-              if (!contributor.nickname || typeof contributor.nickname !== 'string' || contributor.nickname.trim() === '') {
-                errors.push('nickname es requerido');
-              }
-              
-              if (!Array.isArray(contributor.hobbies) || contributor.hobbies.length === 0) {
-                errors.push('hobbies debe tener al menos un elemento');
-              }
-              
-              if (contributor.hobbies && contributor.hobbies.length > 4) {
-                errors.push('máximo 4 hobbies permitidos');
-              }
-              
-              if (contributor.linkedin && (!contributor.linkedin.includes('linkedin.com') || !contributor.linkedin.startsWith('http'))) {
-                errors.push('LinkedIn debe ser una URL válida');
-              }
-              
-              if (errors.length > 0) {
-                console.log(\`❌ Colaborador \${index + 1}: \${errors.join(', ')}\`);
-                process.exit(1);
-              }
-            });
-            
-            console.log('✅ Todos los datos son válidos');
-          "
-
-      - name: PR Success Message
-        run: |
-          echo "🎉 ¡Pull Request listo para merge!"
-          echo "✅ Todas las validaciones pasaron correctamente"
-          echo "🤖 El merge y despliegue se realizará automáticamente tras la aprobación"

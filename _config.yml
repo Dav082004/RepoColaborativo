@@ -15,11 +15,11 @@ exclude:
 # Include important files
 include:
   - "index.html"
-  - "styles.css"
-  - "script.js"
-  - "contributors.js"
+  - "como-contribuir.html"
   - "contributors-data.js"
+  - "js/"
   - "styles/"
+  - "assets/"
 
 # Set the base URL (will be overridden by GitHub Pages)
 baseurl: "/RepoColaborativo"
