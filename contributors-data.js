@@ -22,6 +22,14 @@ const contributors = [
       "Apasionado por la tecnología y la enseñanza. Me encanta crear proyectos que ayuden a otros a aprender.",
     hobbies: ["Programación", "Open Source", "Github", "Gaming"],
   },
+  {
+    name: "Octocat", 
+    nickname: "gat1t0-ola", // ✅ Requerido
+    github: "https://github.com/gat1t0-ola", // ✅ Requerido
+    image: "https://github.com/gat1t0-ola.png", // ⭕ Opcional (se usa tu avatar de GitHub automáticamente o puedes poner una URL de imagen personalizada)
+    description: "Soy un gato con 8 patas", // ✅ Requerido (máximo 150 caracteres)
+    hobbies: ["Programar"], // ✅ Requerido (máximo 4 hobbies)
+  },
 
   // Ahora es tu turno de agregar tu información siguiendo el template de abajo 👇(quita los /* */ de comentario)
   /*{
@@ -33,8 +41,6 @@ const contributors = [
     description: "Una breve descripción sobre ti", // ✅ Requerido (máximo 150 caracteres)
     hobbies: ["Hobby1", "Hobbby2", "Hobby3", "Hobby4"], // ✅ Requerido (máximo 4 hobbies)
   },*/
-  
-  //Sigue por aqui...
 ];
 
 // ⚠️ NO MODIFIQUES NADA DE AQUÍ HACIA ABAJO ⚠️
