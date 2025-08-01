@@ -18,12 +18,9 @@
     <header class="header">
       <div class="header-container">
         <div class="header-logos">
-          <a
-            href="https://docs.github.com/es/education/about-github-education/use-github-at-your-educational-institution/about-github-campus-experts"
-            target="_blank"
-            class="campus-experts-logo">
+          <a href="index.html" target="_blank" class="campus-experts-logo">
             <img
-              src="assets/Github Campus Expert.png"
+              src="assets/Github.png"
               alt="GitHub Campus Experts"
               class="campus-experts-img" />
           </a>
@@ -48,145 +45,309 @@
       <section class="contribute-section">
         <div class="contribute-container">
           <div class="steps-container">
+            <!-- Paso 1: Acceder al Repositorio -->
             <div class="step">
               <div class="step-number">1</div>
               <div class="step-content">
-                <h3><i class="fas fa-code-branch"></i> Fork el Repositorio</h3>
+                <h3>
+                  <i class="fas fa-globe"></i> Accede y Forkea el Repositorio
+                </h3>
                 <p>
-                  Haz un fork de este repositorio a tu cuenta de GitHub haciendo
-                  clic en el botón "Fork" en la página del repositorio.
+                  Ve al repositorio oficial en GitHub y familiarízate con el
+                  proyecto. Revisa el README y la estructura del proyecto. Luego
+                  dale click a Fork y crear un fork del repositorio.
                 </p>
+                <div class="step-image">
+                  <img
+                    src="assets/GuiaPasoAPaso/Paso1.png"
+                    alt="Paso 1: Acceder al repositorio"
+                    class="guide-image" />
+                </div>
                 <div class="code-example">
-                  <pre><code># Clona tu fork
+                  <pre><code># URL del repositorio
+https://github.com/Dav082004/RepoColaborativo</code></pre>
+                </div>
+              </div>
+            </div>
+
+            <!-- Paso 2: Fork del Repositorio -->
+            <div class="step">
+              <div class="step-number">2</div>
+              <div class="step-content">
+                <h3>
+                  <i class="fas fa-code-branch"></i> Haz Fork del Repositorio
+                </h3>
+                <p>
+                  Haz clic en el botón "Fork" en la esquina superior derecha del
+                  repositorio. Esto creará una copia del proyecto en tu cuenta
+                  de GitHub.
+                </p>
+                <div class="step-image">
+                  <img
+                    src="assets/GuiaPasoAPaso/Paso2.png"
+                    alt="Paso 2: Fork del repositorio"
+                    class="guide-image" />
+                </div>
+                <div class="info-box">
+                  <p>
+                    <i class="fas fa-info-circle"></i> El fork te permite
+                    trabajar en tu propia copia sin afectar el original.
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <!-- Paso 3: Clonar el Fork -->
+            <div class="step">
+              <div class="step-number">3</div>
+              <div class="step-content">
+                <h3><i class="fas fa-download"></i> Clona tu Fork</h3>
+                <p>
+                  Verificar que se forkeo y esta en tu perfil ya que debe decir
+                  tu_perfil / RepoColaborativo <br />
+                  Despues clona tu fork a tu computadora local para poder
+                  trabajar en él. Usa el botón "Code" y copia la URL.
+                </p>
+                <div class="step-image">
+                  <img
+                    src="assets/GuiaPasoAPaso/Paso3.png"
+                    alt="Paso 3: Clonar el fork"
+                    class="guide-image" />
+                </div>
+                <div class="code-example">
+                  <pre><code># Clona tu fork (reemplaza TU_USUARIO)
 git clone https://github.com/TU_USUARIO/RepoColaborativo.git
 cd RepoColaborativo</code></pre>
                 </div>
               </div>
             </div>
 
-            <div class="step">
-              <div class="step-number">2</div>
-              <div class="step-content">
-                <h3><i class="fas fa-edit"></i> Agrega tus Datos</h3>
-                <p>
-                  Edita el archivo <code>contributors-data.js</code> y agrega tu
-                  información al final del array.
-                </p>
-                <div class="code-example">
-                  <pre><code>{
-  name: "Tu Nombre Completo",
-  nickname: "tu_github_username",
-  github: "https://github.com/tu_username", // Requerido
-  linkedin: "https://linkedin.com/in/tu-perfil", // Opcional
-  description: "Una breve descripción sobre ti y tu especialidad", // Requerido
-  image: "https://tu-url-de-imagen.com/imagen.jpg", // Opcional
-  hobbies: ["Programación", "Gaming", "Música", "Deportes"] // Máximo 4
-},</code></pre>
-                </div>
-                <div class="info-box">
-                  <h4><i class="fas fa-info-circle"></i> Campos Requeridos:</h4>
-                  <ul>
-                    <li><strong>name:</strong> Tu nombre completo</li>
-                    <li><strong>nickname:</strong> Tu username de GitHub</li>
-                    <li>
-                      <strong>github:</strong> URL completa de tu perfil de
-                      GitHub
-                    </li>
-                    <li>
-                      <strong>description:</strong> Breve descripción sobre ti
-                      (máximo 150 caracteres)
-                    </li>
-                    <li>
-                      <strong>hobbies:</strong> Array con tus hobbies (máximo 4)
-                    </li>
-                  </ul>
-                  <h4><i class="fas fa-star"></i> Campos Opcionales:</h4>
-                  <ul>
-                    <li>
-                      <strong>linkedin:</strong> URL de tu perfil de LinkedIn
-                    </li>
-                    <li>
-                      <strong>image:</strong> URL de tu imagen de perfil
-                      personalizada
-                    </li>
-                  </ul>
-                  <div class="info-box warning">
-                    <h4>
-                      <i class="fas fa-camera"></i> Sobre las Imágenes de
-                      Perfil:
-                    </h4>
-                    <ul>
-                      <li>
-                        Si no proporcionas una imagen, se usará automáticamente
-                        tu avatar de GitHub
-                      </li>
-                      <li>
-                        Si tu imagen personalizada falla al cargar, se mostrará
-                        tu avatar de GitHub como respaldo
-                      </li>
-                      <li>
-                        Si no tienes GitHub, se mostrarán tus iniciales con un
-                        color único
-                      </li>
-                      <li>Formatos recomendados: JPG, PNG, WebP</li>
-                      <li>
-                        Tamaño recomendado: 200x200px o mayor (se ajustará
-                        automáticamente)
-                      </li>
-                    </ul>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <div class="step">
-              <div class="step-number">3</div>
-              <div class="step-content">
-                <h3>
-                  <i class="fas fa-git-alt"></i> Crea una Rama y Haz Commit
-                </h3>
-                <p>
-                  Crea una nueva rama para tus cambios y haz commit con un
-                  mensaje descriptivo.
-                </p>
-                <div class="code-example">
-                  <pre><code># Crea una nueva rama
-git checkout -b feat/add-tu-nickname
-
-# Agrega los cambios
-git add contributors-data.js
-
-# Haz commit con el formato correcto
-git commit -m "feat: add [tu_nickname] to contributors"
-
-# Envía los cambios a tu fork
-git push origin feat/add-tu-nickname</code></pre>
-                </div>
-              </div>
-            </div>
-
+            <!-- Paso 4: Configurar Git -->
             <div class="step">
               <div class="step-number">4</div>
               <div class="step-content">
-                <h3><i class="fas fa-paper-plane"></i> Crea un Pull Request</h3>
+                <h3><i class="fas fa-cog"></i> Configura Git</h3>
                 <p>
-                  Ve a GitHub y crea un Pull Request desde tu fork al
-                  repositorio original.
+                  Configura tu información de Git si no lo has hecho antes. Esto
+                  es importante para identificar tus commits. Despues cuando
+                  estes en la carpeta donde quieras clonar tu repo forkeado
+                  tienes que escribir <b>git clone (URL de tu fork)</b>
                 </p>
-                <div class="info-box">
-                  <h4><i class="fas fa-check-circle"></i> Título del PR:</h4>
-                  <p><code>feat: add [tu_nickname] to contributors</code></p>
+                <div class="step-image">
+                  <img
+                    src="assets/GuiaPasoAPaso/Paso4.png"
+                    alt="Paso 4: Configurar Git"
+                    class="guide-image" />
+                </div>
+                <p>
+                  <b>Nota:</b> Asegurate de que este configurado correctamente
+                </p>
+                <div class="code-example">
+                  <pre><code># Configura tu nombre y email
+git config --global user.name "Tu Nombre"
+git config --global user.email "tu-email@ejemplo.com"
+
+# Verifica la configuración
+git config --list</code></pre>
+                </div>
+              </div>
+            </div>
+
+            <!-- Paso 5: Crear Nueva Rama -->
+            <div class="step">
+              <div class="step-number">5</div>
+              <div class="step-content">
+                <h3>
+                  <i class="fas fa-project-diagram"></i> Crea una Nueva Rama
+                </h3>
+                <p>
+                  Crea una rama específica para tu contribución. Esto mantiene
+                  tu trabajo organizado y separado de la rama principal. Si te
+                  das cuenta sale como (main) eso hace referencia a la rama
+                  actual donde estas, es por eso que cuando creas una nueva rama
+                  en este caso se llama add-gat1t0, donde salia main ahora dice
+                  add-gat1t0 entonces con eso confirmacion el cambio de rama
+                </p>
+                <div class="step-image">
+                  <img
+                    src="assets/GuiaPasoAPaso/Paso5.png"
+                    alt="Paso 5: Crear nueva rama"
+                    class="guide-image" />
+                </div>
+                <div class="code-example">
+                  <pre><code># Crea y cambia a una nueva rama
+git checkout -b feat/add-tu-nickname
+
+# Verifica que estás en la nueva rama
+git branch</code></pre>
+                </div>
+              </div>
+            </div>
+
+            <!-- Paso 6: Abrir el Editor -->
+            <div class="step">
+              <div class="step-number">6</div>
+              <div class="step-content">
+                <h3><i class="fas fa-edit"></i> Abre el Editor de Código</h3>
+                <p>
+                  Abre el proyecto en tu editor favorito (VS Code, Sublime,
+                  etc.). Localiza el archivo <code>contributors-data.js</code>
+                  para poder agregar tu informacion como nombre, nickname de
+                  github, github, linkedin, descripcion y hobbies.
+                </p>
+                <div class="step-image">
+                  <img
+                    src="assets/GuiaPasoAPaso/Paso6.png"
+                    alt="Paso 6: Abrir editor"
+                    class="guide-image" />
+                </div>
+                <div class="code-example">
+                  <pre><code># Si usas VS Code
+code .
+
+# O abre manualmente el archivo
+# contributors-data.js</code></pre>
+                </div>
+              </div>
+            </div>
+
+            <!-- Paso 8: Verificar Cambios -->
+            <div class="step">
+              <div class="step-number">7</div>
+              <div class="step-content">
+                <h3>
+                  <i class="fas fa-search"></i> Verifica y sube tus Cambios
+                </h3>
+                <p>
+                  Revisa que tus cambios sean correctos y que no hayas
+                  modificado accidentalmente otras partes del archivo.
+                </p>
+                <div class="step-image">
+                  <img
+                    src="assets/GuiaPasoAPaso/Paso7.png"
+                    alt="Paso 8: Verificar cambios"
+                    class="guide-image" />
+                </div>
+                <div class="code-example">
+                  <pre><code># Ver qué archivos han cambiado
+git status
+
+#Para juntar todos los cambios
+git add .
+
+#Para guardar los cambios
+git commit -m "feat/add-gat1t0"
+
+#Para subir a tu repositorio tu rama con cambios
+git push origin feat/add-gat1t0
+</code></pre>
+                </div>
+              </div>
+            </div>
+
+            <!-- Paso 8: Hacer Commit -->
+            <div class="step">
+              <div class="step-number">8</div>
+              <div class="step-content">
+                <h3>
+                  <i class="fas fa-save"></i> Iniciamos Pull Request de los
+                  Cambios
+                </h3>
+                <p>
+                  Verificamos que se haya creado la nueva rama y que este los
+                  cambios que hicimos. Luego de verificar que todo esta
+                  correcto, le hacemos click a comparar y pull request.(Boton
+                  verde)
+                </p>
+                <div class="step-image">
+                  <img
+                    src="assets/GuiaPasoAPaso/Paso8.png"
+                    alt="Paso 9: Hacer commit"
+                    class="guide-image" />
+                </div>
+              </div>
+            </div>
+
+            <!-- Paso 9: Push a tu Fork -->
+            <div class="step">
+              <div class="step-number">9</div>
+              <div class="step-content">
+                <h3>
+                  <i class="fas fa-cloud-upload-alt"></i> Abrir PR con la repo
+                  de origin
+                </h3>
+                <p>
+                  Tenemos que darle a Crear Pull Request(Boton verde) para que
+                  aparezca en el repositorio de origin y pueda ser revisada por
+                  el dueño del repositorio. Tambien puedes agregar una
+                  descripción detallada de los cambios que realizaste y por qué
+                  son importantes.
+                </p>
+                <div class="step-image">
+                  <img
+                    src="assets/GuiaPasoAPaso/Paso9.png"
+                    alt="Paso 10: Push a fork"
+                    class="guide-image" />
+                </div>
+              </div>
+            </div>
+
+            <!-- Paso 10: Crear Pull Request -->
+            <div class="step">
+              <div class="step-number">10</div>
+              <div class="step-content">
+                <h3><i class="fas fa-paper-plane"></i> Pull Request Creada</h3>
+                <p>
+                  Una vez que hayas creado el Pull Request, verifica que todo
+                  este bien y que no haya errores al momento de juntar los
+                  cambios. Y esperar que aprueben tu Pull Request.
+                </p>
+                <div class="step-image">
+                  <img
+                    src="assets/GuiaPasoAPaso/Paso10.png"
+                    alt="Paso 11: Crear PR"
+                    class="guide-image" />
+                </div>
+              </div>
+            </div>
+
+            <!-- Paso 12: Esperar Auto-merge -->
+            <div class="step">
+              <div class="step-number">11</div>
+              <div class="step-content">
+                <h3><i class="fas fa-robot"></i> ¡PR Aprobada!</h3>
+                <p>
+                  Si todo está correcto, el sistema automáticamente validará tu
+                  PR y lo mergeará. ¡Aparecerás en la página web en unos
+                  minutos!
+                </p>
+                <div class="step-image">
+                  <img
+                    src="assets/GuiaPasoAPaso/Paso11.png"
+                    alt="Paso 12: Auto-merge"
+                    class="guide-image" />
+                </div>
+                <div class="info-box success">
                   <h4>
-                    <i class="fas fa-align-left"></i> Descripción sugerida:
+                    <i class="fas fa-magic"></i> ¿Qué pasa automáticamente?
                   </h4>
-                  <p>
-                    Agrega una breve descripción de lo que estás agregando, por
-                    ejemplo:
-                  </p>
-                  <code
-                    >"Agregando mi información al directorio de participantes
-                    del taller GitHub Campus Experts."</code
-                  >
+                  <ul>
+                    <li>
+                      ✅ <strong>Validación:</strong> Se verifica el formato y
+                      datos
+                    </li>
+                    <li>
+                      🤖 <strong>Auto-merge:</strong> Si es válido, se mergea
+                      automáticamente
+                    </li>
+                    <li>
+                      🚀 <strong>Deploy:</strong> La página web se actualiza
+                    </li>
+                    <li>
+                      💬 <strong>Comentario:</strong> Recibes confirmación en el
+                      PR
+                    </li>
+                  </ul>
                 </div>
               </div>
             </div>

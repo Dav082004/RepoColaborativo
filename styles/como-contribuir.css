@@ -222,6 +222,91 @@
   color: var(--accent-yellow);
 }
 
+.info-box.success {
+  background: linear-gradient(
+    135deg,
+    rgba(34, 197, 94, 0.1),
+    rgba(22, 163, 74, 0.1)
+  );
+  border-left: 4px solid var(--github-green);
+  border-color: var(--github-green);
+}
+
+.info-box.success::before {
+  background: var(--github-green);
+}
+
+.info-box.success h4 i {
+  color: var(--github-green);
+}
+
+.info-box.success li::before {
+  color: var(--github-green);
+}
+
+/* =====================================================
+   IMÁGENES DE LA GUÍA PASO A PASO
+   ===================================================== */
+.step-image {
+  margin: var(--spacing-lg) 0;
+  border-radius: var(--border-radius-large);
+  overflow: hidden;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+  position: relative;
+}
+
+.step-image:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 35px rgba(0, 0, 0, 0.15);
+}
+
+.guide-image {
+  width: 100%;
+  height: auto;
+  display: block;
+  border-radius: var(--border-radius-large);
+  transition: transform 0.3s ease;
+}
+
+.step-image:hover .guide-image {
+  transform: scale(1.02);
+}
+
+/* Overlay para mejor legibilidad */
+.step-image::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(
+    135deg,
+    rgba(59, 130, 246, 0.05),
+    rgba(16, 185, 129, 0.05)
+  );
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  border-radius: var(--border-radius-large);
+}
+
+.step-image:hover::before {
+  opacity: 1;
+}
+
+/* Responsive para imágenes */
+@media (max-width: 768px) {
+  .step-image {
+    margin: var(--spacing-md) 0;
+    border-radius: var(--border-radius);
+  }
+
+  .guide-image {
+    border-radius: var(--border-radius);
+  }
+}
+
 /* =====================================================
    SECCIÓN DE VALIDACIONES
    ===================================================== */
