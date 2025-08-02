@@ -39,6 +39,19 @@ const contributors = [
     hobbies: ["Programar","Gaming"], // ✅ Requerido (máximo 4 hobbies)
   },
 
+  // Colaboranndo Lennin
+  {
+    name: "Lennin Temoche", 
+    nickname: "Lennin Temoche", // ✅ Requerido
+    github: "https://github.com/LenninTemoche", // ✅ Requerido
+    //linkedin: "https://linkedin.com/in/tu-perfil", // ⭕ Opcional
+    image: "https://github.com/LenninTemoche.png", // ⭕ Opcional (se usa tu avatar de GitHub automáticamente o puedes poner una URL de imagen personalizada)
+    description:
+      "Apasionado por la tecnología y la enseñanza. Me interesa crear y colaborar con proyectos que ayuden a otros a aprender.",
+    hobbies: ["Programación", "Open Source", "Github", "DS"],
+  },
+
+
   // Ahora es tu turno de agregar tu información siguiendo el template de abajo 👇(quita los /* */ de comentario)
   /*{
     name: "Tu Nombre Comleto", 
