@@ -50,7 +50,7 @@ const contributors = [
       "Apasionado por la tecnología y la enseñanza. Me interesa crear y colaborar con proyectos que ayuden a otros a aprender.",
     hobbies: ["Programación", "Open Source", "Github", "DS"],
   },
-];
+
 
   // Ahora es tu turno de agregar tu información siguiendo el template de abajo 👇(quita los /* */ de comentario)
   /*{
