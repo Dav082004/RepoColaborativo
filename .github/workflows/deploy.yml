@@ -8,13 +8,9 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: write
+  contents: read
   pages: write
   id-token: write
-  pull-requests: write
-  checks: write
-  statuses: write
-  actions: write 
 
 concurrency:
   group: "pages"
@@ -191,6 +187,93 @@ jobs:
             echo "✅ $file es válido"
           done
 
+  # Deploy a GitHub Pages
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    needs: validate
+    if: github.ref == 'refs/heads/main'
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Pages
+        uses: actions/configure-pages@v4
+
+      - name: Debug Info
+        run: |
+          echo "🔍 Información de debug:"
+          echo "Ref: ${{ github.ref }}"
+          echo "Event: ${{ github.event_name }}"
+          echo "Actor: ${{ github.actor }}"
+          echo "Repository: ${{ github.repository }}"
+          echo "SHA: ${{ github.sha }}"
+
+      - name: Prepare deployment
+        run: |
+          echo "Preparando archivos para deployment..."
+
+          # Crear directorio de build
+          mkdir -p _site
+
+          # Copiar archivos principales
+          cp index.html _site/
+          cp como-contribuir.html _site/
+          cp contributors-data.js _site/
+
+          # Copiar directorios
+          cp -r js/ _site/js/
+          cp -r styles/ _site/styles/
+
+          # Copiar assets si existen
+          if [ -d "assets" ]; then
+            cp -r assets/ _site/assets/
+          fi
+
+          # Copiar imágenes si existen
+          if [ -d "images" ]; then
+            cp -r images/ _site/images/
+          fi
+
+          # Crear archivo .nojekyll para evitar procesamiento de Jekyll
+          touch _site/.nojekyll
+
+          echo "✅ Archivos preparados para deployment"
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: "_site"
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
+
+  # Verificación post-deploy (solo en main)
+  verify:
+    runs-on: ubuntu-latest
+    needs: deploy
+    if: github.ref == 'refs/heads/main' && needs.deploy.result == 'success'
+    steps:
+      - name: Verify deployment
+        run: |
+          echo "Verificando deployment..."
+
+          # Esperar un momento para que el deployment esté disponible
+          sleep 30
+
+          # Verificar que la página principal responde
+          if curl -f -s "https://${{ github.repository_owner }}.github.io/RepoColaborativo/" > /dev/null; then
+            echo "✅ Página principal accessible"
+          else
+            echo "❌ Error: Página principal no accessible"
+            exit 1
+          fi
+
+          echo "✅ Deployment verificado exitosamente"
+
   # Validación para Pull Requests
   validate-pr:
     if: github.event_name == 'pull_request'
@@ -214,12 +297,15 @@ jobs:
           # Obtener archivos modificados con manejo de error
           CHANGED_FILES=""
           if git merge-base origin/main HEAD >/dev/null 2>&1; then
+            # Hay una base común, usar diff normal
             CHANGED_FILES=$(git diff --name-only origin/main...HEAD)
           else
+            # No hay base común (primera vez), usar diff directo
             echo "⚠️ No se encontró base común, comparando con HEAD~1"
             if git rev-parse HEAD~1 >/dev/null 2>&1; then
               CHANGED_FILES=$(git diff --name-only HEAD~1 HEAD)
             else
+              # Si es el primer commit, mostrar todos los archivos
               echo "ℹ️ Primer commit detectado, validando archivos actuales"
               CHANGED_FILES=$(git ls-files)
             fi
@@ -228,20 +314,26 @@ jobs:
           echo "📝 Archivos modificados:"
           echo "$CHANGED_FILES"
 
+          # Si no hay archivos modificados, salir
           if [ -z "$CHANGED_FILES" ]; then
             echo "ℹ️ No se detectaron cambios en archivos"
             exit 0
           fi
 
+          # Permitir cambios solo en contributors-data.js y archivos de documentación
+          # Para setup inicial, permitir archivos del proyecto base
           ALLOWED_PATTERN="^(contributors-data\.js|README\.md|\.github/.*|docs/.*|_config\.yml|\.gitignore|index\.html|como-contribuir\.html|js/.*|styles/.*|assets/.*)$"
+
+          # Detectar si es setup inicial (muchos archivos principales presentes)
           SETUP_FILES_COUNT=$(echo "$CHANGED_FILES" | grep -E "(index\.html|contributors-data\.js|js/|styles/)" | wc -l)
 
           if [ "$SETUP_FILES_COUNT" -gt 3 ]; then
-            echo "🔧 Setup inicial detectado - validación flexible"
+            echo "🔧 Setup inicial detectado - permitiendo archivos del proyecto base"
             IS_INITIAL_SETUP=true
           else
-            echo "📝 Pull Request regular - validación estricta"
+            echo "📝 Pull Request regular - aplicando restricciones estrictas"
             IS_INITIAL_SETUP=false
+            # Para PRs regulares, solo permitir contributors-data.js y docs
             ALLOWED_PATTERN="^(contributors-data\.js|README\.md|\.github/.*|docs/.*)$"
           fi
 
@@ -257,20 +349,24 @@ jobs:
             fi
           done <<< "$CHANGED_FILES"
 
+          # Validar que se agregó exactamente un colaborador (solo si existe contributors-data.js)
           if echo "$CHANGED_FILES" | grep -q "contributors-data.js" && [ -f "contributors-data.js" ]; then
             echo "✅ contributors-data.js fue modificado"
             
+            # Validar el formato del nuevo colaborador
             CHANGED_FILES="$CHANGED_FILES" node -e "
               const fs = require('fs');
               const { execSync } = require('child_process');
               
               try {
+                // Obtener la versión actual
                 const currentContent = fs.readFileSync('contributors-data.js', 'utf8');
                 const currentMatch = currentContent.match(/const contributors = (\[[\s\S]*?\]);/);
                 const currentContributors = currentMatch ? eval(currentMatch[1]) : [];
                 
                 console.log(\`📊 Colaboradores actuales: \${currentContributors.length}\`);
                 
+                // Intentar obtener la versión de main
                 let mainContributors = [];
                 let isInitialSetup = false;
                 
@@ -281,18 +377,20 @@ jobs:
                   mainContributors = mainMatch ? eval(mainMatch[1]) : [];
                   console.log(\`📊 Colaboradores en main: \${mainContributors.length}\`);
                 } catch (error) {
-                  console.log('ℹ️ No se pudo obtener versión anterior (posible setup inicial)');
+                  console.log('ℹ️ No se pudo obtener versión anterior (posiblemente primer commit o setup inicial)');
                   isInitialSetup = true;
                 }
                 
+                // Detectar setup inicial por cantidad de archivos cambiados
                 const setupFilesPattern = /(index\.html|js\/|styles\/|assets\/)/;
                 const changedFiles = process.env.CHANGED_FILES || '';
                 const hasSetupFiles = changedFiles.split('\\n').some(file => setupFilesPattern.test(file));
                 
                 if (isInitialSetup || hasSetupFiles) {
-                  console.log('🔧 Setup inicial detectado - validación flexible');
+                  console.log('🔧 Setup inicial detectado - validación flexible de colaboradores');
                   if (currentContributors.length > 0) {
-                    console.log(\`✅ Setup inicial con \${currentContributors.length} colaborador(es)\`);
+                    console.log(\`✅ Setup inicial con \${currentContributors.length} colaborador(es) detectado\`);
+                    // Validar formato de cada colaborador pero permitir múltiples
                     currentContributors.forEach((contributor, index) => {
                       if (contributor.name && contributor.nickname && contributor.hobbies) {
                         console.log(\`✅ Colaborador \${index + 1}: \${contributor.name} (@\${contributor.nickname})\`);
@@ -315,16 +413,22 @@ jobs:
                   process.exit(1);
                 }
                 
+                // Encontrar el nuevo colaborador
                 const newContributor = currentContributors.find(c => 
                   !mainContributors.some(m => m.nickname === c.nickname)
                 );
                 
                 if (newContributor) {
                   console.log(\`✅ Nuevo colaborador detectado: \${newContributor.name} (@\${newContributor.nickname})\`);
+                  console.log(\`   Hobbies: \${newContributor.hobbies.join(', ')}\`);
+                  if (newContributor.linkedin) {
+                    console.log(\`   LinkedIn: \${newContributor.linkedin}\`);
+                  }
                 } else {
                   console.log('❌ Error: No se pudo identificar el nuevo colaborador');
                   process.exit(1);
                 }
+                
               } catch (error) {
                 console.log('❌ Error al validar colaboradores:', error.message);
                 process.exit(1);
@@ -344,103 +448,77 @@ jobs:
     permissions:
       contents: write
       pull-requests: write
-      checks: write
-      statuses: write
     steps:
       - name: Checkout
         uses: actions/checkout@v4
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Auto-approve PR
+      - name: Auto-merge PR
         run: |
-          echo "✅ Aprobando PR automáticamente..."
-          curl -X POST \
-            -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
-            -H "Accept: application/vnd.github.v3+json" \
-            "https://api.github.com/repos/${{ github.repository }}/pulls/${{ github.event.number }}/reviews" \
-            -d '{
-              "event": "APPROVE",
-              "body": "✅ Validación automática exitosa. Este PR será mergeado automáticamente."
-            }'
+          echo "🤖 Iniciando auto-merge para PR #${{ github.event.number }}"
 
-      - name: Enable auto-merge
-        run: |
-          echo "🤖 Activando auto-merge para PR #${{ github.event.number }}..."
+          # Información del PR
+          echo "📋 Información del PR:"
+          echo "Número: ${{ github.event.number }}"
+          echo "Autor: ${{ github.event.pull_request.user.login }}"
+          echo "Título: ${{ github.event.pull_request.title }}"
+          echo "Base: ${{ github.event.pull_request.base.ref }}"
+          echo "Head: ${{ github.event.pull_request.head.ref }}"
+
+          # Verificar que el PR esté abierto y sea hacia main
+          if [ "${{ github.event.pull_request.state }}" != "open" ]; then
+            echo "❌ El PR no está abierto"
+            exit 1
+          fi
+
+          if [ "${{ github.event.pull_request.base.ref }}" != "main" ]; then
+            echo "❌ El PR no es hacia la rama main"
+            exit 1
+          fi
+
+          # Hacer merge del PR
+          echo "🔄 Realizando merge del PR..."
+
           curl -X PUT \
             -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
             -H "Accept: application/vnd.github.v3+json" \
             "https://api.github.com/repos/${{ github.repository }}/pulls/${{ github.event.number }}/merge" \
             -d '{
               "commit_title": "Auto-merge: ${{ github.event.pull_request.title }}",
-              "commit_message": "Merged by automated workflow.\nPR Author: ${{ github.event.pull_request.user.login }}",
+              "commit_message": "Merged by automated workflow after successful validation.\n\nPR Author: ${{ github.event.pull_request.user.login }}\nValidation passed: ✅",
               "merge_method": "squash"
             }'
+            
+          if [ $? -eq 0 ]; then
+            echo "✅ PR mergeado exitosamente"
+            echo "🚀 El deployment se activará automáticamente en unos momentos"
+            
+            # Esperar un momento para que el merge se propague
+            sleep 5
+            
+            # Activar el workflow de deploy manualmente
+            echo "🔄 Activando workflow de deploy..."
+            curl -X POST \
+              -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+              -H "Accept: application/vnd.github.v3+json" \
+              "https://api.github.com/repos/${{ github.repository }}/actions/workflows/deploy.yml/dispatches" \
+              -d '{"ref":"main"}'
+              
+          else
+            echo "❌ Error al mergear el PR"
+            exit 1
+          fi
 
       - name: Comentar en el PR
         if: success()
         run: |
-          echo "💬 Notificando al usuario..."
+          echo "💬 Agregando comentario de confirmación al PR..."
+
           curl -X POST \
             -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
             -H "Accept: application/vnd.github.v3+json" \
             "https://api.github.com/repos/${{ github.repository }}/issues/${{ github.event.number }}/comments" \
             -d '{
-              "body": "🎉 **¡Contribución aceptada!**\n\n✅ Validación pasó\n🤖 PR mergeado automáticamente\n🚀 Tu perfil aparecerá en [la página web](https://${{ github.repository_owner }}.github.io/RepoColaborativo/) en unos minutos\n\n¡Gracias por contribuir! 👏"
+              "body": "🎉 **Auto-merge exitoso!**\n\n✅ Todas las validaciones pasaron correctamente\n🤖 PR mergeado automáticamente\n🚀 Tu contribución estará disponible en la página web en unos minutos\n\n¡Gracias por tu contribución! 🙌\n\n---\n*Este comentario fue generado automáticamente por el workflow de CI/CD*"
             }'
-
-  # Deploy a GitHub Pages
-  deploy:
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
-    runs-on: ubuntu-latest
-    needs: [validate, auto-merge]
-    if: github.ref == 'refs/heads/main' || github.event_name == 'workflow_dispatch'
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Setup Pages
-        uses: actions/configure-pages@v4
-
-      - name: Prepare deployment
-        run: |
-          echo "Preparando archivos para deployment..."
-          mkdir -p _site
-          cp index.html _site/
-          cp como-contribuir.html _site/
-          cp contributors-data.js _site/
-          cp -r js/ _site/js/
-          cp -r styles/ _site/styles/
-          [ -d "assets" ] && cp -r assets/ _site/assets/
-          [ -d "images" ] && cp -r images/ _site/images/
-          touch _site/.nojekyll
-          echo "✅ Archivos preparados para deployment"
-
-      - name: Upload artifact
-        uses: actions/upload-pages-artifact@v3
-        with:
-          path: "_site"
-
-      - name: Deploy to GitHub Pages
-        id: deployment
-        uses: actions/deploy-pages@v4
-
-  # Verificación post-deploy
-  verify:
-    runs-on: ubuntu-latest
-    needs: deploy
-    if: github.ref == 'refs/heads/main' && needs.deploy.result == 'success'
-    steps:
-      - name: Verify deployment
-        run: |
-          echo "Verificando deployment..."
-          sleep 30
-          if curl -f -s "https://${{ github.repository_owner }}.github.io/RepoColaborativo/" > /dev/null; then
-            echo "✅ Página principal accessible"
-          else
-            echo "❌ Error: Página principal no accessible"
-            exit 1
-          fi
-          echo "✅ Deployment verificado exitosamente"
