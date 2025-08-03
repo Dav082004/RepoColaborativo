@@ -60,7 +60,6 @@ const contributors = [
     description: "Soy Gastón Peló, Analista de Datos Jr.", // ✅ Requerido (máximo 150 caracteres)
     hobbies: ["Programación", "Visualización de Datos", "Modelado 3D"], // ✅ Requerido (máximo 4 hobbies)
   },
-
   {
     name: "Kenneth Torres",
     nickname: "KennethTorres", // ✅ Requerido
@@ -70,7 +69,15 @@ const contributors = [
     description: "Desarrollador de Software | Apasionado por la tecnología, el desarrollo web y la resolución de problemas, enfocado en el aprendizaje continuo y la creación de soluciones funcionales.",
     hobbies: ["Programación", "Desarrollo Web", "Github", "Gaming"], // ✅ Requerido (máximo 4 hobbies)
   },
-
+  {
+    name: "David Chavarría",
+    nickname: "davidch", // ✅ Requerido
+    github: "https://github.com/Dave0097-hdz", // ✅ Requerido
+    linkedin: "https://www.linkedin.com/in/david-hernandez-dev/", // ⭕ Opcional
+    image: "https://github.com/Dave0097-hdz.png",
+    description: "Soy un estudiante apasionado por la programación y la tecnología. Me encanta seguir aprendiendo de nuevas tecnologías y me gusta compartir mi conocimientos con otros.",
+    hobbies: ["Developer", "Open Source", "Github", "Gaming"],
+  }
 ];
 
 // ⚠️ NO MODIFIQUES NADA DE AQUÍ HACIA ABAJO ⚠️
