@@ -21,22 +21,6 @@ Al participar en este proyecto, practicarás y aprenderás:
 - 🔄 **Pull Requests**: Proponer cambios para revisión
 - 🤝 **Merge**: Integrar cambios al proyecto principal
 
-#### **Desarrollo Colaborativo**
-
-- 📋 **Code Review**: Entender el proceso de revisión de código
-- 🤖 **CI/CD**: Trabajar con validaciones automáticas
-- 📖 **Documentación**: Seguir guidelines y estándares
-- 🐛 **Issue Tracking**: Reportar y resolver problemas
-- 👥 **Open Source**: Contribuir a proyectos de la comunidad
-
-#### **Habilidades Técnicas**
-
-- 💻 **JSON**: Trabajar con formato de datos estructurados
-- 🌐 **Web Development**: Entender estructura de proyectos web
-- ⚙️ **Git CLI**: Comandos de terminal y control de versiones
-- 🔍 **Debugging**: Identificar y corregir errores
-- 📱 **Responsive Design**: Observar cómo se adapta tu contribución
-
 ### 🚀 Tipos de Contribución
 
 #### **🆕 Contribución Básica (Recomendada para Principiantes)**
@@ -52,16 +36,6 @@ Al participar en este proyecto, practicarás y aprenderás:
   hobbies: ["Hobby1", "Hobby2", "Hobby3", "Hobby4"] // Máximo 4
 }
 ```
-
-#### **🔧 Contribuciones Avanzadas (Para Desarrolladores Experimentados)**
-
-- 🐛 **Bug Fixes**: Corregir errores en el código
-- ✨ **Features**: Agregar nuevas funcionalidades
-- 🎨 **UI/UX**: Mejorar diseño y experiencia de usuario
-- 📖 **Documentation**: Ampliar guías y documentación
-- ⚡ **Performance**: Optimizar velocidad y rendimiento
-- 🧪 **Testing**: Agregar pruebas automatizadas
-
 ### 🎓 Lo Que Aprenderás Paso a Paso
 
 1. **Configuración de Entorno** → Git, GitHub, editor de código
@@ -72,16 +46,6 @@ Al participar en este proyecto, practicarás y aprenderás:
 6. **Code Review** → Recibir feedback y mejorar código
 7. **Continuous Integration** → Validaciones automáticas
 8. **Merge y Deploy** → Ver tu trabajo en producción
-
-### 🌟 ¡Tu Primera Contribución!
-
-Este proyecto es **perfecto para tu primer Pull Request** porque:
-
-- ✅ **Proceso guiado** con documentación detallada
-- ✅ **Validación automática** que te ayuda a corregir errores
-- ✅ **Comunidad amigable** dispuesta a ayudar
-- ✅ **Resultado visible** en la página web
-- ✅ **Experiencia real** de desarrollo colaborativo
 
 ## 📊 Flujo de Contribución
 
