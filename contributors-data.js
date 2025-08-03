@@ -36,7 +36,7 @@ const contributors = [
     github: "https://github.com/MathiasAugustto", // ✅ Requerido
     image: "https://github.com/MathiasAugustto.png", // ⭕ Opcional (se usa tu avatar de GitHub automáticamente o puedes poner una URL de imagen personalizada)
     description: "Estudiante en UPC", // ✅ Requerido (máximo 150 caracteres)
-    hobbies: ["Programar","Gaming"], // ✅ Requerido (máximo 4 hobbies)
+    hobbies: ["Programar","Gaming","Git"], // ✅ Requerido (máximo 4 hobbies)
   },
 
   // Colaboranndo Lennin
