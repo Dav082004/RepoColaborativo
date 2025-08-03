@@ -60,6 +60,15 @@ const contributors = [
     description: "Soy Gastón Peló, Analista de Datos Jr.", // ✅ Requerido (máximo 150 caracteres)
     hobbies: ["Programación", "Visualización de Datos", "Modelado 3D"], // ✅ Requerido (máximo 4 hobbies)
   },
+  {
+    name: "David Chavarría",
+    nickname: "davidch",
+    github: "https://github.com/Dave0097-hdz",
+    linkedin: "https://www.linkedin.com/in/david-hernandez-dev/",
+    image: "https://github.com/Dave0097-hdz.png",
+    description: "Soy un estudiante apasionado por la programación y la tecnología. Me encanta seguir aprendiendo de nuevas tecnologías y me gusta compartir mi conocimientos con otros.",
+    hobbies: ["Developer", "Open Source", "Github", "Gaming"],
+  }
 ];
 
 // ⚠️ NO MODIFIQUES NADA DE AQUÍ HACIA ABAJO ⚠️
