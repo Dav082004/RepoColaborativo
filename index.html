@@ -18,24 +18,28 @@
     <header class="header">
       <div class="header-container">
         <div class="header-logos">
-          <a href="index.html" target="_blank" class="campus-experts-logo">
+          <a href="index.html" class="campus-experts-logo">
             <img
               src="assets/Github.png"
               alt="GitHub Campus Experts"
               class="campus-experts-img" />
           </a>
         </div>
-        <nav class="header-nav">
-          <a href="index.html" class="nav-link active">Inicio</a>
+        <nav class="header-nav" id="headerNav">
+          <a href="#inicio" class="nav-link active">Inicio</a>
+          <a href="#participantes" class="nav-link">Colaboradores</a>
           <a href="como-contribuir.html" class="nav-link">Cómo Contribuir</a>
         </nav>
-        <div class="mobile-menu-toggle">
-          <span></span>
-          <span></span>
-          <span></span>
-        </div>
+        <button class="mobile-menu-toggle" id="mobileMenuToggle">
+          <span class="hamburger-line"></span>
+          <span class="hamburger-line"></span>
+          <span class="hamburger-line"></span>
+        </button>
       </div>
     </header>
+
+    <!-- Overlay para menú móvil -->
+    <div class="mobile-overlay" id="mobileOverlay"></div>
 
     <!-- Main Content -->
     <main class="main-content">

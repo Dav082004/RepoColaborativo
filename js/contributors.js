@@ -203,51 +203,6 @@ function addScrollAnimations() {
   });
 }
 
-// Función para mostrar un mensaje de bienvenida
-function showWelcomeMessage() {
-  // Crear notificación de bienvenida
-  const notification = document.createElement("div");
-  notification.style.cssText = `
-        position: fixed;
-        top: 20px;
-        right: 20px;
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        color: white;
-        padding: 1rem 1.5rem;
-        border-radius: 12px;
-        box-shadow: 0 10px 25px rgba(0,0,0,0.2);
-        z-index: 1000;
-        transform: translateX(400px);
-        transition: transform 0.5s ease;
-        max-width: 300px;
-    `;
-
-  notification.innerHTML = `
-        <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.5rem;">
-            <i class="fas fa-rocket"></i>
-            <strong>¡Bienvenido!</strong>
-        </div>
-        <div style="font-size: 0.9rem; opacity: 0.9;">
-            Explora la página y aprende cómo contribuir a proyectos open source
-        </div>
-    `;
-
-  document.body.appendChild(notification);
-
-  // Animar entrada
-  setTimeout(() => {
-    notification.style.transform = "translateX(0)";
-  }, 1000);
-
-  // Remover después de 5 segundos
-  setTimeout(() => {
-    notification.style.transform = "translateX(400px)";
-    setTimeout(() => {
-      notification.remove();
-    }, 500);
-  }, 5000);
-}
-
 // Función para validar los datos de contribuidores
 function validateContributors() {
   const errors = [];
@@ -303,9 +258,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // Agregar animaciones de scroll
   setTimeout(addScrollAnimations, 500);
-
-  // Mostrar mensaje de bienvenida
-  setTimeout(showWelcomeMessage, 2000);
 });
 
 // Exportar funciones para testing (si es necesario)
