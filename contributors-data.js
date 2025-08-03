@@ -60,6 +60,17 @@ const contributors = [
     description: "Soy Gastón Peló, Analista de Datos Jr.", // ✅ Requerido (máximo 150 caracteres)
     hobbies: ["Programación", "Visualización de Datos", "Modelado 3D"], // ✅ Requerido (máximo 4 hobbies)
   },
+
+  {
+    name: "Kenneth Torres",
+    nickname: "KennethTorres", // ✅ Requerido
+    github: "https://github.com/KennethTorres", // ✅ Requerido
+    linkedin: "https://www.linkedin.com/in/kennethtorresbrizuela/", // ⭕ Opcional
+    //image: "",
+    description: "Desarrollador de Software | Apasionado por la tecnología, el desarrollo web y la resolución de problemas, enfocado en el aprendizaje continuo y la creación de soluciones funcionales.",
+    hobbies: ["Programación", "Desarrollo Web", "Github", "Gaming"], // ✅ Requerido (máximo 4 hobbies)
+  },
+
 ];
 
 // ⚠️ NO MODIFIQUES NADA DE AQUÍ HACIA ABAJO ⚠️
