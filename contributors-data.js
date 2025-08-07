@@ -77,6 +77,15 @@ const contributors = [
     image: "https://github.com/Dave0097-hdz.png",
     description: "Soy un estudiante apasionado por la programación y la tecnología. Me encanta seguir aprendiendo de nuevas tecnologías y me gusta compartir mi conocimientos con otros.",
     hobbies: ["Developer", "Open Source", "Github", "Gaming"],
+  },
+  {
+  name: "Andres Torres",
+  nickname: "iAndresTM", // Requerido
+  github: "https://github.com/iAndresTM", // Requerido
+  linkedin: "https://www.linkedin.com/in/andres-torres-1913a3270/", // Opcional
+  image: "https://github.com/iAndresTM.png", // Opcional
+  description: "Analista y desarrollador de software | Ciberseguridad enthusiast | Aprendiz Backend | Amante de la tecnología y la innovación.",
+  hobbies: ["Basquetbol", "Programar", "Gaming", "Soccer"] // Máximo 4
   }
 ];
 
